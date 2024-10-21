@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Editor</title>
+    <link rel="stylesheet" href="editor.css">
+    <script src="JS/common.js" defer></script>
+    <script src="JS/editor.js" defer></script>
+</head>
+
+<body>
+<h1>Edition:</h1>
+    <div id="menu">
+        <div id="room">
+            <div id="AddRoom">
+                <h2>Éditeur de pieces</h2>
+                <textarea id="RoomValue" rows="10" cols="50" placeholder="Éditez vos pieces ici..."></textarea>
+                <input type="submit" id="RoomSubmit" value="Ajouter">
+            </div>
+            <input type="button" value="Ajouter une piece" id="RoomButton">
+        </div>
+        <div id="msg">
+            <div id="AddMsg">
+                <h2>Éditeur de messages</h2>
+                <textarea id="MsgValue" rows="10" cols="50" placeholder="Éditez vos messages ici..."></textarea>
+                <input type="submit" id="MsgSubmit" value="Ajouter">
+            </div>
+            <input type="button" value="Ajouter un message" id="MsgButton">
+        </div>
+        <div id="obj">
+            <div id="AddObj">
+                <h2>Éditeur d'objets</h2>
+                <textarea id="ObjValue" rows="10" cols="50" placeholder="Éditez vos objets ici..."></textarea>
+                <input type="submit" id="ObjSubmit" value="Ajouter">
+            </div>
+            <input type="button" value="Ajouter un objet" id="ObjButton">
+        </div>
+    </div>
+    <div id="params">
+        <div id="word">
+            <p id="wordSize_p">Longueur maximum d'un mot : </p>
+            <input type="number" id="wordSize">
+            <input type="submit" id="submitWord" value="Modifier">
+        </div>
+        <div id="mobj">
+            <p id="maxObj_p">Nombre maximum d'objets dans l'inventaire : </p>
+            <input type="number" id="maxObj">
+            <input type="submit" id="submitObj" value="Modifier">
+        </div>
+        <div id="save">
+            <p id="maxSave_p">Nombre maximum de sauvegarde : </p>
+            <input type="number" id="maxSave">
+            <input type="submit" id="submitSave" value="Modifier">
+        </div>
+    </div>
+</body>
+</html>
+
+<!--
+<div id="home" style="display: block;">
+    <p>Bienvenue dans l'éditeur. Choisissez une option dans le menu pour commencer.</p>
+</div>
+<div id="messageEditor" style="display: none;">
+    <h2>Éditeur de messages</h2>
+    <textarea id="messageArea" rows="10" cols="50" placeholder="Éditez vos messages ici..."></textarea>
+    <input type="submit"/>
+</div>
+<div id="descriptionEditor" style="display: none;">
+    <h2>Éditeur de pieces</h2>
+    <textarea id="descriptionArea" rows="10" cols="50" placeholder="Éditez vos pieces ici..."></textarea>
+</div>
+<div id="objectEditor" style="display: none;">
+    <h2>Éditeur d'objets</h2>
+    <textarea id="objectArea" rows="10" cols="50" placeholder="Éditez vos objets ici..."></textarea>
+</div>
+
+//* function showPage(page) {
+    // Masquer toutes les divisions
+    document.getElementById('home').style.display = 'none';
+    document.getElementById('messageEditor').style.display = 'none';
+    document.getElementById('descriptionEditor').style.display = 'none';
+    document.getElementById('objectEditor').style.display = 'none';
+
+    // Afficher la division sélectionnée
+    document.getElementById(page).style.display = 'block';
+}
+
+  <ul>
+    <li><a href="#" onclick="showPage('messageEditor')">Éditeur de messages</a></li>
+    <li><a href="#" onclick="showPage('descriptionEditor')">Éditeur de descriptions</a></li>
+    <li><a href="#" onclick="showPage('objectEditor')">Éditeur d'objets</a></li>
+  </ul>
