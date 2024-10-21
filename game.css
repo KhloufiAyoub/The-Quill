@@ -53,32 +53,6 @@
     border: 2px solid var(--input-focus);
 }
 
-.button-log {
-    cursor: pointer;
-    width: 40px;
-    height: 40px;
-    border-radius: 100%;
-    border: 2px solid var(--main-color);
-    background-color: var(--bg-color);
-    box-shadow: 4px 4px var(--main-color);
-    color: var(--font-color);
-    font-size: 25px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-
-.icon {
-    width: 24px;
-    height: 24px;
-    fill: var(--main-color);
-}
-
-.button-log:active, .button-confirm:active {
-    box-shadow: 0 0 var(--main-color);
-    transform: translate(3px, 3px);
-}
-
 .button-confirm {
     margin: 50px auto 0 auto;
     width: 120px;

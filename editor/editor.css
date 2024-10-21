@@ -5,12 +5,20 @@
   left: 0;
   width: 100%;
   height: 60px;
-  background-color: #9f9d9e;
+  --font-color: #323232;
+  --input-focus: #ff0000;
+  --bg-color: #fff;
+  --font-color-sub: #666;
+  --main-color: #323232;
+  background: lightgrey;
   padding: 10px 0;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
   display: flex;
   justify-content: center;
   align-items: center;
+  gap: 20px;
+  border-radius: 5px;
+  border: 2px solid var(--main-color);
+  box-shadow: 4px 4px var(--main-color);
 }
 
 #menu ul {
@@ -37,12 +45,58 @@
 
 #msg,#obj,#room{
   position: absolute;
-  top: 60px;
-  left: 0;
+  top: 100px;
+  left: 10px;
   width: 100%;
 }
 #AddRoom, #AddMsg, #AddObj {
   display: none;
+}
+
+#game input[type="button"] {
+  width: 100%;
+  height: 40px;
+  padding: 10px;
+  margin-bottom: 10px;
+  border: 2px solid var(--main-color);
+  border-radius: 4px;
+  background-color: var(--bg-color);
+  box-shadow: 4px 4px var(--main-color);
+  font-size: 17px;
+  font-weight: 600;
+  transition: box-shadow 0.3s ease, transform 0.3s ease;
+}
+
+
+
+#menu ul li input[type="button"]::placeholder {
+  color: var(--font-color-sub);
+  opacity: 0.8;
+}
+
+#menu ul li input[type="button"]:focus {
+  border: 2px solid var(--input-focus);
+}
+
+#menu ul li input[type="button"]{
+    width: 100%;
+    height: 40px;
+    padding: 10px;
+    margin-bottom: 10px;
+    border: 2px solid var(--main-color);
+    border-radius: 4px;
+    background-color: var(--bg-color);
+    box-shadow: 4px 4px var(--main-color);
+    font-size: 17px;
+    font-weight: 600;
+    color: var(--font-color);
+    cursor: pointer;
+    transition: box-shadow 0.3s ease, transform 0.3s ease;
+}
+
+#menu ul li input[type="button"]:hover {
+    box-shadow: 0 0 var(--main-color);
+    transform: translate(3px, 3px);
 }
 
 #params{
