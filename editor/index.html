@@ -9,52 +9,56 @@
 </head>
 
 <body>
-<h1>Edition:</h1>
+    <h1>Edition:</h1>
     <div id="menu">
-        <div id="room">
+        <div id="room" class="input__container">
             <div id="AddRoom">
                 <h2>Éditeur de pieces</h2>
-                <textarea id="RoomValue" rows="10" cols="50" placeholder="Éditez vos pieces ici..."></textarea>
-                <input type="submit" id="RoomSubmit" value="Ajouter">
+                <textarea id="RoomValue" rows="10" cols="50" class="input__search" placeholder="Éditez vos pieces ici..."></textarea>
+                <input type="submit" id="RoomSubmit" class="input__button__shadow" value="Ajouter">
             </div>
-            <input type="button" value="Ajouter une piece" id="RoomButton">
+            <input type="button" value="Ajouter une piece" id="RoomButton" class="input__button__shadow">
         </div>
-        <div id="msg">
+        
+        <div id="msg" class="input__container">
             <div id="AddMsg">
                 <h2>Éditeur de messages</h2>
-                <textarea id="MsgValue" rows="10" cols="50" placeholder="Éditez vos messages ici..."></textarea>
-                <input type="submit" id="MsgSubmit" value="Ajouter">
+                <textarea id="MsgValue" rows="10" cols="50" class="input__search" placeholder="Éditez vos messages ici..."></textarea>
+                <input type="submit" id="MsgSubmit" class="input__button__shadow" value="Ajouter">
             </div>
-            <input type="button" value="Ajouter un message" id="MsgButton">
+            <input type="button" value="Ajouter un message" id="MsgButton" class="input__button__shadow">
         </div>
-        <div id="obj">
+
+        <div id="obj" class="input__container">
             <div id="AddObj">
                 <h2>Éditeur d'objets</h2>
-                <textarea id="ObjValue" rows="10" cols="50" placeholder="Éditez vos objets ici..."></textarea>
-                <input type="submit" id="ObjSubmit" value="Ajouter">
+                <textarea id="ObjValue" rows="10" cols="50" class="input__search" placeholder="Éditez vos objets ici..."></textarea>
+                <input type="submit" id="ObjSubmit" class="input__button__shadow" value="Ajouter">
             </div>
-            <input type="button" value="Ajouter un objet" id="ObjButton">
+            <input type="button" value="Ajouter un objet" id="ObjButton" class="input__button__shadow">
         </div>
     </div>
-    <div id="params">
+
+    <div id="params" class="input__container">
         <div id="word">
             <p id="wordSize_p">Longueur maximum d'un mot : </p>
-            <input type="number" id="wordSize">
-            <input type="submit" id="submitWord" value="Modifier">
+            <input type="number" id="wordSize" class="input__search">
+            <input type="submit" id="submitWord" class="input__button__shadow" value="Modifier">
         </div>
         <div id="mobj">
             <p id="maxObj_p">Nombre maximum d'objets dans l'inventaire : </p>
-            <input type="number" id="maxObj">
-            <input type="submit" id="submitObj" value="Modifier">
+            <input type="number" id="maxObj" class="input__search">
+            <input type="submit" id="submitObj" class="input__button__shadow" value="Modifier">
         </div>
         <div id="save">
             <p id="maxSave_p">Nombre maximum de sauvegarde : </p>
-            <input type="number" id="maxSave">
-            <input type="submit" id="submitSave" value="Modifier">
+            <input type="number" id="maxSave" class="input__search">
+            <input type="submit" id="submitSave" class="input__button__shadow" value="Modifier">
         </div>
     </div>
 </body>
 </html>
+
 
 <!--
 <div id="home" style="display: block;">
