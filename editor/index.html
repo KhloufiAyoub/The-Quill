@@ -11,6 +11,38 @@
 <body>
     <h1>Edition:</h1>
     <div id="menu">
+        <ul>
+            <li><a id="RoomButton">Ajouter une piece</a></li>
+            <li><a id="MsgButton">Ajouter un message</a></li>
+            <li><a id="ObjButton">Ajouter un objet</a></li>
+        </ul>
+    </div>
+    <div id="editor">
+        <div id="room" class="input__container">
+            <div id="AddRoom">
+                <h2>Éditeur de pieces</h2>
+                <textarea id="RoomValue" rows="10" cols="50" class="input__search" placeholder="Éditez vos pieces ici..."></textarea>
+                <input type="submit" id="RoomSubmit" class="input__button__shadow" value="Ajouter">
+            </div>
+        </div>
+
+        <div id="msg" class="input__container">
+            <div id="AddMsg">
+                <h2>Éditeur de messages</h2>
+                <textarea id="MsgValue" rows="10" cols="50" class="input__search" placeholder="Éditez vos messages ici..."></textarea>
+                <input type="submit" id="MsgSubmit" class="input__button__shadow" value="Ajouter">
+            </div>
+        </div>
+
+        <div id="obj" class="input__container">
+            <div id="AddObj">
+                <h2>Éditeur d'objets</h2>
+                <textarea id="ObjValue" rows="10" cols="50" class="input__search" placeholder="Éditez vos objets ici..."></textarea>
+                <input type="submit" id="ObjSubmit" class="input__button__shadow" value="Ajouter">
+            </div>
+        </div>
+    <!--
+    <div id="menu1">
         <div id="room" class="input__container">
             <div id="AddRoom">
                 <h2>Éditeur de pieces</h2>
@@ -56,6 +88,7 @@
             <input type="submit" id="submitSave" class="input__button__shadow" value="Modifier">
         </div>
     </div>
+    -->
 </body>
 </html>
 

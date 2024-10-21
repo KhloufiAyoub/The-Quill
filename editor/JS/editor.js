@@ -10,7 +10,6 @@ function init(){
     $("submitWord").onclick = EditWord;
     $("submitObj").onclick = EditObj;
     $("submitSave").onclick = EditSave;
-    hide("AddRoom");
     hide("AddMsg");
     hide("AddObj");
     GetMaxValue();
