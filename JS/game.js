@@ -48,10 +48,6 @@ function showGameScreen(){
 function endgame(){
     console.log("Game ended");
     $("area").value = "";
-    hideGameScreen();
-}
-
-function hideGameScreen(){
     hide("game");
     show("auth");
     $("username").focus();
