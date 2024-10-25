@@ -30,32 +30,34 @@ function ShowObject(){
     hide("AddMsg");
     show("AddObj");
 }
-function Add(url,param){
+
+
+function Add(url,param, element){
+    element.value="";
     var xmlHttpRequest= new XMLHttpRequest();
     xmlHttpRequest.open("POST",url,true);
     xmlHttpRequest.setRequestHeader("Content-Type","application/x-www-form-urlencoded");
     xmlHttpRequest.send(param);
 }
 
-
 function AddRoom(){
-    var roomName = $("RoomValue").value;
+    var roomName = $("RoomValue");
     var url="PHP/AddRoom.php";
-    var param="room="+encodeURIComponent(roomName);
+    var param="room="+encodeURIComponent(roomName.value);
     Add(url,param,roomName);
 }
 
 function AddMessage(){
-    var msgName = $("MsgValue").value;
+    var msgName = $("MsgValue");
     var url="PHP/AddMsg.php";
-    var param="msg="+encodeURIComponent(msgName);
+    var param="msg="+encodeURIComponent(msgName.value);
     Add(url,param,msgName);
 }
 
 function AddObject(){
-    var objName = $("ObjValue").value;
+    var objName = $("ObjValue");
     var url="PHP/AddObj.php";
-    var param="obj="+encodeURIComponent(objName);
+    var param="obj="+encodeURIComponent(objName.value);
     Add(url,param,objName);
 }
 
