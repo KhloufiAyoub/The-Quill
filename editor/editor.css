@@ -16,7 +16,7 @@
   justify-content: center;
   align-items: center;
   gap: 20px;
-  border: 2px solid var(--main-color);
+    border: 2px solid black;
 }
 
 #menu ul {
@@ -56,7 +56,7 @@
   height: 40px;
   padding: 10px;
   margin-bottom: 10px;
-  border: 2px solid var(--main-color);
+    border: 2px solid black;
   border-radius: 4px;
   background-color: var(--bg-color);
   box-shadow: 4px 4px var(--main-color);
@@ -73,7 +73,7 @@
 }
 
 #menu ul li input[type="button"]:focus {
-  border: 2px solid var(--input-focus);
+    border: 2px solid black;
 }
 
 #menu ul li input[type="button"]{
@@ -81,7 +81,7 @@
     height: 40px;
     padding: 10px;
     margin-bottom: 10px;
-    border: 2px solid var(--main-color);
+    border: 2px solid black;
     border-radius: 4px;
     background-color: var(--bg-color);
     box-shadow: 4px 4px var(--main-color);
@@ -99,13 +99,22 @@
 
 #params{
     position: absolute;
-    top: 60px;
+    top: 82px;
     right: 0;
-    width: 300px;
+    width: 350px;
     height: 100%;
     background-color: #f0f0f0;
     padding: 20px;
     box-shadow: -2px 0 5px rgba(0, 0, 0, 0.1);
+    border: 2px solid black;
+}
+
+#mobj, #word, #save{
+    padding: 10px;
+}
+
+#maxObj_p, #maxSave_p, #wordSize_p{
+    margin: 10px 0;
 }
 
 /**.input__container {
