@@ -30,7 +30,7 @@ function ShowObject(){
     hide("AddMsg");
     show("AddObj");
 }
-function Add(url,param,element){
+function Add(url,param){
     var xmlHttpRequest= new XMLHttpRequest();
     xmlHttpRequest.open("POST",url,true);
     xmlHttpRequest.setRequestHeader("Content-Type","application/x-www-form-urlencoded");
