@@ -104,6 +104,13 @@
 #maxObj_p, #maxSave_p, #wordSize_p{
     margin: 10px 0;
 }
+table, td, tr, th{
+    border: 1px solid black;
+    border-collapse: collapse;
+}
+td, tr{
+    border-collapse: collapse;
+}
 
 /**.input__container {
   position: relative;
