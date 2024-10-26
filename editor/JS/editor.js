@@ -34,10 +34,10 @@ function ShowObject(){
 
 function Add(url,param, element){
     element.value="";
-    var xmlHttpRequest= new XMLHttpRequest();
-    xmlHttpRequest.open("POST",url,true);
-    xmlHttpRequest.setRequestHeader("Content-Type","application/x-www-form-urlencoded");
-    xmlHttpRequest.send(param);
+    var xhr= new XMLHttpRequest();
+    xhr.open("POST",url,true);
+    xhr.setRequestHeader("Content-Type","application/x-www-form-urlencoded");
+    xhr.send(param);
 }
 
 function AddRoom(){
@@ -62,15 +62,15 @@ function AddObject(){
 }
 
 function Edit(url,param){
-    var xmlHttpRequest= new XMLHttpRequest();
-    xmlHttpRequest.onreadystatechange = function(){
-        if (xmlHttpRequest.readyState === 4 && xmlHttpRequest.status === 200){
+    var xhr= new XMLHttpRequest();
+    xhr.onreadystatechange = function(){
+        if (xhr.readyState === 4 && xhr.status === 200){
             GetMaxValue();
         }
     }
-    xmlHttpRequest.open("POST",url,true);
-    xmlHttpRequest.setRequestHeader("Content-Type","application/x-www-form-urlencoded");
-    xmlHttpRequest.send(param);
+    xhr.open("POST",url,true);
+    xhr.setRequestHeader("Content-Type","application/x-www-form-urlencoded");
+    xhr.send(param);
 }
 
 function EditWord(){
@@ -98,14 +98,14 @@ function EditSave(){
 
 function GetMaxValue(){
     var url="PHP/GetMaxValue.php";
-    var xmlHttpRequest= new XMLHttpRequest();
-    xmlHttpRequest.onreadystatechange = function(){
-        if (xmlHttpRequest.readyState === 4 && xmlHttpRequest.status === 200){
-            SplitValue(xmlHttpRequest.responseText);
+    var xhr= new XMLHttpRequest();
+    xhr.onreadystatechange = function(){
+        if (xhr.readyState === 4 && xhr.status === 200){
+            SplitValue(xhr.responseText);
         }
     }
-    xmlHttpRequest.open("POST",url,true);
-    xmlHttpRequest.send();
+    xhr.open("POST",url,true);
+    xhr.send();
 }
 
 function SplitValue(response){

@@ -12,15 +12,15 @@ function initgame(){
     var psw = $("psw").value;
     var url="PHP/login.php";
     var param="username="+encodeURIComponent(username)+"&psw="+encodeURIComponent(psw);
-    var xmlHttpRequest= new XMLHttpRequest();
-    xmlHttpRequest.onreadystatechange = function(){
-        if (xmlHttpRequest.readyState === 4 && xmlHttpRequest.status === 200){
-            connection(xmlHttpRequest.responseText);
+    var xhr= new XMLHttpRequest();
+    xhr.onreadystatechange = function(){
+        if (xhr.readyState === 4 && xhr.status === 200){
+            connection(xhr.responseText);
         }
     }
-    xmlHttpRequest.open("POST",url,true);
-    xmlHttpRequest.setRequestHeader("Content-Type","application/x-www-form-urlencoded");
-    xmlHttpRequest.send(param);
+    xhr.open("POST",url,true);
+    xhr.setRequestHeader("Content-Type","application/x-www-form-urlencoded");
+    xhr.send(param);
 }
 
 function connection(response){
@@ -57,15 +57,15 @@ function submitInput(){
     var gameInput = $("gameInput").value;
     var url="PHP/AddCommand.php";
     var param="gameInput="+encodeURIComponent(gameInput);
-    var xmlHttpRequest= new XMLHttpRequest();
-    xmlHttpRequest.onreadystatechange = function(){
-        if (xmlHttpRequest.readyState === 4 && xmlHttpRequest.status === 200){
-            showCommand(xmlHttpRequest.responseText);
+    var xhr= new XMLHttpRequest();
+    xhr.onreadystatechange = function(){
+        if (xhr.readyState === 4 && xhr.status === 200){
+            showCommand(xhr.responseText);
         }
     }
-    xmlHttpRequest.open("POST",url,true);
-    xmlHttpRequest.setRequestHeader("Content-Type","application/x-www-form-urlencoded");
-    xmlHttpRequest.send(param);
+    xhr.open("POST",url,true);
+    xhr.setRequestHeader("Content-Type","application/x-www-form-urlencoded");
+    xhr.send(param);
 }
 
 function showCommand(response){
