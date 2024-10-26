@@ -1,75 +1,75 @@
-
 #menu {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 60px;
-  --font-color: #323232;
-  --input-focus: #ff0000;
-  --bg-color: #fff;
-  --font-color-sub: #666;
-  --main-color: #323232;
-  background: lightgrey;
-  padding: 10px 0;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 20px;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 60px;
+    --font-color: #323232;
+    --input-focus: #ff0000;
+    --bg-color: #fff;
+    --font-color-sub: #666;
+    --main-color: #323232;
+    background: lightgrey;
+    padding: 10px 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 20px;
     border: 2px solid black;
 }
 
 #menu ul {
-  list-style-type: none;
-  padding: 0;
-  margin: 0;
-  display: flex;
-  gap: 20px;
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    gap: 20px;
 }
 
 #menu ul li {
-  margin: 0;
-  text-align: center;
+    margin: 0;
+    text-align: center;
 }
 
 #menu ul li a {
-  text-decoration: none;
-  color: #fff;
-  display: block;
-  padding: 10px 20px;
-  transition: background-color 0.3s ease;
-  font-family: 'Press Start 2P', cursive;
+    text-decoration: none;
+    color: #fff;
+    display: block;
+    padding: 10px 20px;
+    transition: background-color 0.3s ease;
+    font-family: 'Press Start 2P', cursive;
 }
 
 #msg,#obj,#room{
-  position: absolute;
-  top: 100px;
-  left: 10px;
-  width: 100%;
+    position: absolute;
+    top: 100px;
+    left: 10px;
+    width: 100%;
 }
 #AddRoom, #AddMsg, #AddObj {
-  display: none;
+    display: none;
 }
 
 #game input[type="button"] {
-  width: 100%;
-  height: 40px;
-  padding: 10px;
-  margin-bottom: 10px;
+
+    width: 100%;
+    height: 40px;
+    padding: 10px;
+    margin-bottom: 10px;
     border: 2px solid black;
-  border-radius: 4px;
-  background-color: var(--bg-color);
-  box-shadow: 4px 4px var(--main-color);
-  font-size: 17px;
-  font-weight: 600;
-  transition: box-shadow 0.3s ease, transform 0.3s ease;
+    border-radius: 4px;
+    background-color: var(--bg-color);
+    box-shadow: 4px 4px var(--main-color);
+    font-size: 17px;
+    font-weight: 600;
+    transition: box-shadow 0.3s ease, transform 0.3s ease;
 }
 
 
 
 #menu ul li input[type="button"]::placeholder {
-  color: var(--font-color-sub);
-  opacity: 0.8;
+    color: var(--font-color-sub);
+    opacity: 0.8;
 }
 
 #menu ul li input[type="button"]:focus {
