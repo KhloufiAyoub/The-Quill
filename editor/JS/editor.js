@@ -5,8 +5,11 @@ function init(){
     $("MsgButton").onclick = ShowMessage;
     $("ObjButton").onclick = ShowObject;
     $("RoomSubmit").onclick = AddRoom;
+    $("RoomCancel").onclick = function () {hide("AddRoom");};
     $("MsgSubmit").onclick = AddMessage;
+    $("MsgCancel").onclick = function () {hide("AddMsg");};
     $("ObjSubmit").onclick = AddObject;
+    $("ObjCancel").onclick = function () {hide("AddObj");};
     $("submitWord").onclick = EditWord;
     $("submitObj").onclick = EditObj;
     $("submitSave").onclick = EditSave;
@@ -163,7 +166,7 @@ function GetObject(){
     var xhr= new XMLHttpRequest();
     xhr.onreadystatechange = function(){
         if (xhr.readyState === 4 && xhr.status === 200){
-            ProcessRequestObj(xhr.responseText,"objid","objdesc", "startloc");
+            ProcessRequestObj(xhr.responseText,["objid","objdesc", "startloc"]);
         }
     }
     xhr.open("POST",url,true);
@@ -182,7 +185,7 @@ function Truncate(str, n){
     return (str.length > n) ? str.substring(0, n-1) + "..." : str;
 }
 
-function NewLine(tr, item, UseInnerHTML){
+function InsertColumn(tr, item, UseInnerHTML){
     var td = document.createElement("TD");
     if (UseInnerHTML){
         td.innerHTML=Truncate(item, 80);
@@ -193,26 +196,31 @@ function NewLine(tr, item, UseInnerHTML){
     tr.appendChild(td);
 }
 
+
 function ProcessRequest(str,elements, isDeletable=true, isEditable=true, UseInnerHTML=false){
     var result = JSON.parse(str);
     var el=document.getElementById("maDiv");
     var i,j,tbl,tr;
     el.innerHTML="";
     tbl=document.createElement("TABLE");
+    //Entête du tableau
     tr = document.createElement("TR");
     for (j=0;j<elements.length;j++){
-        NewLine(tr, elements[j]);
+        InsertColumn(tr, elements[j]);
     }
     tbl.appendChild(tr);
-
+    //Corps du tableau
     for(i=0;i<result.length;i++) {
         tr=document.createElement("TR");
+        //Insertion des colonnes
         for (j=0;j<elements.length;j++) {
-            NewLine(tr, result[i][elements[j]],UseInnerHTML);
+            InsertColumn(tr, result[i][elements[j]],UseInnerHTML);
         }
+        //Insertion des images de suppression
         if (isDeletable) {
             InsertImg(tr, "../img/icone-delete.png");
         }
+        //Insertion des images d'édition
         if (isEditable) {
             InsertImg(tr, "../img/icone-edit.png");
         }
@@ -221,48 +229,26 @@ function ProcessRequest(str,elements, isDeletable=true, isEditable=true, UseInne
     el.appendChild(tbl);
 }
 
-function ProcessRequestObj(str,id, element,startloc){
+function ProcessRequestObj(str, elements){
     var result = JSON.parse(str);
     var el=document.getElementById("maDiv");
-    var i;
+    var i, j,tbl,tr, td,select, options;
     el.innerHTML="";
-    var tbl,tr, th, td, tn,select, options, location;
     tbl=document.createElement("TABLE");
     tr = document.createElement("TR");
-    th=document.createElement("TH");
-    tn=document.createTextNode(id);
-    th.appendChild(tn);
-    tr.appendChild(th);
-    th=document.createElement("TH");
-    tn=document.createTextNode(element);
-    th.appendChild(tn);
-    tr.appendChild(th);
-    th=document.createElement("TH");
-    tn=document.createTextNode(startloc);
-    th.appendChild(tn);
-    tr.appendChild(th);
+    for (j=0;j<elements.length;j++){
+        InsertColumn(tr, elements[j]);
+    }
     tbl.appendChild(tr);
 
-
-
-
-        GetRoomArray(function (array) {
-            for(i=0;i<result.length;i++) {
+    GetRoomArray(function (array) {
+        for(i=0;i<result.length;i++) {
             tr=document.createElement("TR");
-
-            td=document.createElement("TD");
-            tn=document.createTextNode(result[i][id]);
-            td.appendChild(tn);
-            tr.appendChild(td);
-
-            td=document.createElement("TD");
-            tn=document.createTextNode(result[i][element]);
-            td.appendChild(tn);
-            tr.appendChild(td);
-
+            for (j=0;j<elements.length;j++) {
+                InsertColumn(tr, result[i][elements[j]]);
+            }
             td = document.createElement("TD");
             select = document.createElement("SELECT");
-            location = array;
             options = ["non créé", "transporté", "porté"].concat(array);
             options.forEach(optionText => {
                 var option = document.createElement("OPTION");
@@ -272,14 +258,11 @@ function ProcessRequestObj(str,id, element,startloc){
             });
             td.appendChild(select);
             tr.appendChild(td);
-
-
             InsertImg(tr,"../img/icone-delete.png");
+            InsertImg(tr,"../img/icone-edit.png");
             tbl.appendChild(tr)
-            }
-        });
-
-
+        }
+    });
     el.appendChild(tbl);
 }
 
