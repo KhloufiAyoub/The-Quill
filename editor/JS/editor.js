@@ -80,7 +80,6 @@ function Edit(url,param){
 
 function EditWord(){
     var wordSize = $("wordSize").value;
-    console.log(wordSize);
     var url="PHP/EditWord.php";
     var param="wordSize="+encodeURIComponent(wordSize);
     Edit(url,param);
@@ -88,7 +87,6 @@ function EditWord(){
 
 function EditObj(){
     var maxObj = $("maxObj").value;
-    console.log(maxObj);
     var url="PHP/EditObj.php";
     var param="maxObj="+encodeURIComponent(maxObj);
     Edit(url,param);
@@ -129,182 +127,95 @@ function SplitValue(response){
     $("maxSave").value="";
 }
 
-function GetRoom(){
-    var url="PHP/GetRoom.php";
+function Get(url, elements, isDeletable=true, isEditable=true, UseInnerHTML=false){
     var xhr= new XMLHttpRequest();
     xhr.onreadystatechange = function(){
         if (xhr.readyState === 4 && xhr.status === 200){
-            ProcessRequest(xhr.responseText, "rid", "roomdesc")
+            ProcessRequest(xhr.responseText, elements, isDeletable, isEditable, UseInnerHTML);
         }
     }
     xhr.open("POST",url,true);
     xhr.send();
+}
+
+function GetRoom(){
+    var url="PHP/GetRoom.php";
+    Get(url,["rid","roomdesc"],true,true,true);
 }
 
 function GetMessage(){
     var url="PHP/GetMessage.php";
-    var xhr= new XMLHttpRequest();
-    xhr.onreadystatechange = function(){
-        if (xhr.readyState === 4 && xhr.status === 200){
-            ProcessRequest(xhr.responseText,"mid","message")
-        }
-    }
-    xhr.open("POST",url,true);
-    xhr.send();
+    Get(url,["mid","message"]);
 }
 
 function GetSmsg(){
     var url="PHP/GetSmsg.php";
-    var xhr= new XMLHttpRequest();
-    xhr.onreadystatechange = function(){
-        if (xhr.readyState === 4 && xhr.status === 200){
-            ProcessRequestSmsg(xhr.responseText,"smid","message")
-        }
-    }
-    xhr.open("POST",url,true);
-    xhr.send();
+    Get(url,["smid","message"], false, false)
 }
 
 function GetMove(){
     var url="PHP/GetMove.php";
-    var xhr= new XMLHttpRequest();
-    xhr.onreadystatechange = function(){
-        if (xhr.readyState === 4 && xhr.status === 200){
-            ProcessRequestMove(xhr.responseText,"rid","word", "newroom")
-        }
-    }
-    xhr.open("POST",url,true);
-    xhr.send();
+    Get(url,["rid","word", "newroom"], true,false)
 }
+
 function GetObject(){
     var url="PHP/GetObj.php";
     var xhr= new XMLHttpRequest();
     xhr.onreadystatechange = function(){
         if (xhr.readyState === 4 && xhr.status === 200){
-            ProcessRequestObj(xhr.responseText,"objid","objdesc", "startloc")
+            ProcessRequestObj(xhr.responseText,"objid","objdesc", "startloc");
         }
     }
     xhr.open("POST",url,true);
     xhr.send();
 }
 
-function ProcessRequest(str,id,element){
-    var result = JSON.parse(str);
-    var el=document.getElementById("maDiv");
-    var i;
-    el.innerHTML="";
-    var tbl,tr, th, td, tn, img;
-    tbl=document.createElement("TABLE");
-    tr = document.createElement("TR");
-    th=document.createElement("TH");
-    tn=document.createTextNode(id);
-    th.appendChild(tn);
-    tr.appendChild(th);
-    th=document.createElement("TH");
-    tn=document.createTextNode(element);
-    th.appendChild(tn);
-    tr.appendChild(th);
-    tbl.appendChild(tr);
-
-    for(i=0;i<result.length;i++) {
-        tr=document.createElement("TR");
-        td=document.createElement("TD");
-        tn=document.createTextNode(result[i][id]);
-        td.appendChild(tn);
-        tr.appendChild(td);
-        td=document.createElement("TD");
-        tn=document.createTextNode((result[i][element]).trunc(50));
-        td.appendChild(tn);
-        tr.appendChild(td);
-        img=document.createElement("IMG");
-        img.src="../img/icone-delete.png";
-        td=document.createElement("TD");
-        td.appendChild(img);
-        tr.appendChild(td);
-        img=document.createElement("IMG");
-        img.src="../img/icone-edit.png";
-        td=document.createElement("TD");
-        td.appendChild(img);
-        tr.appendChild(td);
-        tbl.appendChild(tr)
-    }
-    el.appendChild(tbl);
+function InsertImg(tr, source){
+    var img = document.createElement("IMG");
+    var td = document.createElement("TD");
+    img.src=source;
+    td.appendChild(img);
+    tr.appendChild(td);
 }
 
-function ProcessRequestSmsg(str,id,element){
-    var result = JSON.parse(str);
-    var el=document.getElementById("maDiv");
-    var i;
-    el.innerHTML="";
-    var tbl,tr, th, td, tn;
-    tbl=document.createElement("TABLE");
-    tr = document.createElement("TR");
-    th=document.createElement("TH");
-    tn=document.createTextNode(id);
-    th.appendChild(tn);
-    tr.appendChild(th);
-    th=document.createElement("TH");
-    tn=document.createTextNode(element);
-    th.appendChild(tn);
-    tr.appendChild(th);
-    tbl.appendChild(tr);
-
-    for(i=0;i<result.length;i++) {
-        tr=document.createElement("TR");
-        td=document.createElement("TD");
-        tn=document.createTextNode(result[i][id]);
-        td.appendChild(tn);
-        tr.appendChild(td);
-        td=document.createElement("TD");
-        tn=document.createTextNode((result[i][element]).trunc(50));
-        td.appendChild(tn);
-        tr.appendChild(td);
-        tbl.appendChild(tr)
-    }
-    el.appendChild(tbl);
+function Truncate(str, n){
+    return (str.length > n) ? str.substring(0, n-1) + "..." : str;
 }
 
-function ProcessRequestMove(str,id,word, element){
+function NewLine(tr, item, UseInnerHTML){
+    var td = document.createElement("TD");
+    if (UseInnerHTML){
+        td.innerHTML=Truncate(item, 80);
+    }else {
+        var tn = document.createTextNode(Truncate(item, 80));
+        td.appendChild(tn);
+    }
+    tr.appendChild(td);
+}
+
+function ProcessRequest(str,elements, isDeletable=true, isEditable=true, UseInnerHTML=false){
     var result = JSON.parse(str);
     var el=document.getElementById("maDiv");
-    var i;
+    var i,j,tbl,tr;
     el.innerHTML="";
-    var tbl,tr, th, td, tn, img;
     tbl=document.createElement("TABLE");
     tr = document.createElement("TR");
-    th=document.createElement("TH");
-    tn=document.createTextNode(id);
-    th.appendChild(tn);
-    tr.appendChild(th);
-    th=document.createElement("TH");
-    tn=document.createTextNode(word);
-    th.appendChild(tn);
-    tr.appendChild(th);
-    th=document.createElement("TH");
-    tn=document.createTextNode(element);
-    th.appendChild(tn);
-    tr.appendChild(th);
+    for (j=0;j<elements.length;j++){
+        NewLine(tr, elements[j]);
+    }
     tbl.appendChild(tr);
 
     for(i=0;i<result.length;i++) {
         tr=document.createElement("TR");
-        td=document.createElement("TD");
-        tn=document.createTextNode(result[i][id]);
-        td.appendChild(tn);
-        tr.appendChild(td);
-        td=document.createElement("TD");
-        tn=document.createTextNode(result[i][word]);
-        td.appendChild(tn);
-        tr.appendChild(td);
-        td=document.createElement("TD");
-        tn=document.createTextNode(result[i][element]);
-        td.appendChild(tn);
-        tr.appendChild(td);
-        img=document.createElement("IMG");
-        img.src="../img/icone-delete.png";
-        td=document.createElement("TD");
-        td.appendChild(img);
-        tr.appendChild(td);
+        for (j=0;j<elements.length;j++) {
+            NewLine(tr, result[i][elements[j]],UseInnerHTML);
+        }
+        if (isDeletable) {
+            InsertImg(tr, "../img/icone-delete.png");
+        }
+        if (isEditable) {
+            InsertImg(tr, "../img/icone-edit.png");
+        }
         tbl.appendChild(tr)
     }
     el.appendChild(tbl);
@@ -315,7 +226,7 @@ function ProcessRequestObj(str,id, element,startloc){
     var el=document.getElementById("maDiv");
     var i;
     el.innerHTML="";
-    var tbl,tr, th, td, tn, img, select, options, location;
+    var tbl,tr, th, td, tn,select, options, location;
     tbl=document.createElement("TABLE");
     tr = document.createElement("TR");
     th=document.createElement("TH");
@@ -352,7 +263,6 @@ function ProcessRequestObj(str,id, element,startloc){
             td = document.createElement("TD");
             select = document.createElement("SELECT");
             location = array;
-            console.log("0"+array); // Affiche les données
             options = ["non créé", "transporté", "porté"].concat(array);
             options.forEach(optionText => {
                 var option = document.createElement("OPTION");
@@ -364,11 +274,7 @@ function ProcessRequestObj(str,id, element,startloc){
             tr.appendChild(td);
 
 
-            img=document.createElement("IMG");
-            img.src="../img/icone-delete.png";
-            td=document.createElement("TD");
-            td.appendChild(img);
-            tr.appendChild(td);
+            InsertImg(tr,"../img/icone-delete.png");
             tbl.appendChild(tr)
             }
         });

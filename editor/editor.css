@@ -16,6 +16,19 @@
     align-items: center;
     gap: 20px;
     border: 2px solid var(--main-color);
+    z-index: 1;
+}
+#editor{
+    position: absolute;
+    top: 80px;
+    left: 0;
+    width: 100%;
+    height: calc(100% - 60px);
+    background-color: #ffffff;
+    padding: 20px;
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+    border: 2px solid var(--main-color);
+    overflow: auto;
 }
 
 #menu ul {
