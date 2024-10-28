@@ -10,7 +10,7 @@ function init(){
 function initgame(){
     var username = $("username").value;
     var psw = $("psw").value;
-    var url="PHP/login.php";
+    var url="PHP/Login.php";
     var param="username="+encodeURIComponent(username)+"&psw="+encodeURIComponent(psw);
     var xhr= new XMLHttpRequest();
     xhr.onreadystatechange = function(){

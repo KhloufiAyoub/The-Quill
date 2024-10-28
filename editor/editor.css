@@ -46,7 +46,7 @@
     font-family: 'Press Start 2P', cursive;
 }
 
-#AddRoom, #AddMsg, #AddObj {
+#AddRoom, #AddMsg, #AddObj,#AddMove, #AddVocab {
     display: none;
 }
 

@@ -4,12 +4,18 @@ function init(){
     $("RoomButton").onclick = ShowRoom;
     $("MsgButton").onclick = ShowMessage;
     $("ObjButton").onclick = ShowObject;
+    $("MoveButton").onclick = ShowMove;
+    $("VocabButton").onclick = ShowVocab;
     $("RoomSubmit").onclick = AddRoom;
     $("RoomCancel").onclick = function () {hide("AddRoom");};
     $("MsgSubmit").onclick = AddMessage;
     $("MsgCancel").onclick = function () {hide("AddMsg");};
     $("ObjSubmit").onclick = AddObject;
     $("ObjCancel").onclick = function () {hide("AddObj");};
+    $("VocabSubmit").onclick = AddVocab;
+    $("VocabCancel").onclick = function () {hide("AddVocab");};
+    $("MoveSubmit").onclick = AddMove;
+    $("MoveCancel").onclick = function () {hide("AddMove");};
     $("submitWord").onclick = EditWord;
     $("submitObj").onclick = EditObj;
     $("submitSave").onclick = EditSave;
@@ -18,27 +24,49 @@ function init(){
     $("GetSmsg").onclick = GetSmsg;
     $("GetMove").onclick = GetMove;
     $("GetObject").onclick = GetObject;
+    $("GetVocab").onclick = GetVocab;
     GetMaxValue();
 }
 
 function ShowRoom(){
     hide("AddMsg");
     hide("AddObj");
+    hide("AddVocab");
+    hide("AddMove");
     show("AddRoom");
 }
 
 function ShowMessage(){
     hide("AddRoom");
     hide("AddObj");
+    hide("AddVocab");
+    hide("AddMove");
     show("AddMsg");
 }
 
 function ShowObject(){
     hide("AddRoom");
     hide("AddMsg");
+    hide("AddVocab");
+    hide("AddMove");
     show("AddObj");
 }
 
+function ShowVocab(){
+    hide("AddRoom");
+    hide("AddMsg");
+    hide("AddObj");
+    hide("AddMove");
+    show("AddVocab");
+}
+
+function ShowMove(){
+    hide("AddRoom");
+    hide("AddMsg");
+    hide("AddObj");
+    hide("AddVocab");
+    show("AddMove");
+}
 
 function Add(url,param, element){
     element.value="";
@@ -67,6 +95,14 @@ function AddObject(){
     var url="PHP/AddObj.php";
     var param="obj="+encodeURIComponent(objName.value);
     Add(url,param,objName);
+}
+
+function AddVocab(){
+    console.log("AddVocab");
+}
+
+function AddMove(){
+    console.log("AddMove");
 }
 
 function Edit(url,param){
@@ -161,6 +197,11 @@ function GetMove(){
     Get(url,["rid","word", "newroom"], true,false)
 }
 
+function GetVocab(){
+    var url="PHP/GetVocab.php";
+    Get(url,["wid","word"], true,false)
+}
+
 function GetObject(){
     var url="PHP/GetObj.php";
     var xhr= new XMLHttpRequest();
@@ -227,6 +268,15 @@ function ProcessRequest(str,elements, isDeletable=true, isEditable=true, UseInne
     el.appendChild(tbl);
 }
 
+function Truncate(str, lenght){
+    if (typeof str === "string") {
+        if (str.length > lenght) {
+            str = str.substring(0, lenght) + "...";
+        }
+    }
+    return str;
+}
+/**
 function ProcessRequestObj(str, elements){
     var result = JSON.parse(str);
     var el=document.getElementById("maDiv");
@@ -260,12 +310,11 @@ function ProcessRequestObj(str, elements){
             InsertImg(tr,"../img/icone-edit.png");
             tbl.appendChild(tr)
         }
-    });
+    }, "PHP/GetRoom.php", "roomdesc");
     el.appendChild(tbl);
 }
 
-function GetRoomArray(callback) {
-    var url = "PHP/GetRoom.php";
+function GetRoomArray(callback, url,element) {
     var xhr = new XMLHttpRequest();
     xhr.onreadystatechange = function () {
         if (xhr.readyState === 4 && xhr.status === 200) {
@@ -274,19 +323,88 @@ function GetRoomArray(callback) {
                 var result = JSON.parse(str);
                 var array = [];
                 for (let i = 0; i < result.length; i++) {
-                    array.push(result[i][element].trunc(20));
+                    array.push(Truncate(result[i][element], 20));
                 }
                 return array;
             }
-
             // Appel de la fonction imbriquée avec les données nécessaires
-            var array = ProcessRequestRoomArray(xhr.responseText, "roomdesc");
+            var array = ProcessRequestRoomArray(xhr.responseText, element);
             callback(array); // Exécute la fonction de rappel avec le tableau obtenu
         }
     };
     xhr.open("POST", url, true);
     xhr.send();
+}*/
+
+function InsertSelect(tr, array){
+    var td = document.createElement("TD");
+    var select = document.createElement("SELECT");
+    var i;
+    for (i = 0; i < array.length; i++) {
+        var option = document.createElement("OPTION");
+        option.value = array[i];
+        option.textContent = array[i];
+        select.appendChild(option);
+    }
+    td.appendChild(select);
+    tr.appendChild(td);
 }
+
+function ProcessRequestObj(str, elements) {
+    var result = JSON.parse(str);
+    var el = document.getElementById("maDiv");
+    el.innerHTML = "";
+    var tbl = document.createElement("TABLE");
+    var tr = document.createElement("TR");
+    for (var j = 0; j < elements.length; j++) {
+        InsertColumn(tr, elements[j]);
+    }
+    tbl.appendChild(tr);
+
+    result.forEach(function(item) {
+        var tr = document.createElement("TR");
+        elements.forEach(function(element) {
+            InsertColumn(tr, item[element]);
+        });
+
+        Promise.all([
+            GetRoomArray("PHP/GetRoom.php", "roomdesc"),
+            GetRoomArray("PHP/GetVocab.php", "word")
+        ]).then(function(arrays) {
+            var location=["Non créé","Transporté", "Porté"].concat(arrays[0]);
+            var vocab = ["-----"].concat(arrays[1]);
+            InsertSelect(tr, location);
+            InsertSelect(tr, vocab);
+            InsertImg(tr, "../img/icone-delete.png");
+            InsertImg(tr, "../img/icone-edit.png");
+            tbl.appendChild(tr);
+        });
+    });
+
+    el.appendChild(tbl);
+}
+
+function GetRoomArray(url, element) {
+    return new Promise(function(resolve, reject) {
+        var xhr = new XMLHttpRequest();
+        xhr.onreadystatechange = function() {
+            if (xhr.readyState === 4) {
+                if (xhr.status === 200) {
+                    var result = JSON.parse(xhr.responseText);
+                    var array = result.map(function(item) {
+                        return item[element].trunc(20);
+                    });
+                    resolve(array);
+                } else {
+                    reject("Error: " + xhr.status);
+                }
+            }
+        };
+        xhr.open("POST", url, true);
+        xhr.send();
+    });
+}
+
 
 
 
