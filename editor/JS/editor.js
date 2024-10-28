@@ -181,21 +181,19 @@ function InsertImg(tr, source){
     tr.appendChild(td);
 }
 
-function Truncate(str, n){
-    return (str.length > n) ? str.substring(0, n-1) + "..." : str;
-}
-
 function InsertColumn(tr, item, UseInnerHTML){
     var td = document.createElement("TD");
+    if (typeof item === "string") {
+        item = item.trunc(80, true, true);
+    }
     if (UseInnerHTML){
-        td.innerHTML=Truncate(item, 80);
+        td.innerHTML=item;
     }else {
-        var tn = document.createTextNode(Truncate(item, 80));
+        var tn = document.createTextNode(item);
         td.appendChild(tn);
     }
     tr.appendChild(td);
 }
-
 
 function ProcessRequest(str,elements, isDeletable=true, isEditable=true, UseInnerHTML=false){
     var result = JSON.parse(str);

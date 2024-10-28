@@ -488,7 +488,6 @@ if (!Array.prototype.filter) {
 		return res;
 	};
 }
-
 /** Truncate a string to a maximum size.
  * This function  allows to truncate a string to a maximum
  * size found in the n parameter. If useBoundary is true, it
@@ -502,10 +501,10 @@ if (!Array.prototype.filter) {
  */
 
 String.prototype.trunc =
-     function( n, useWordBoundary, ellipsis ){
-         if (this.length <= n) { return this; }
-         var subString = this.substr(0, n-1);
+	function( n, useWordBoundary, ellipsis ){
+		if (this.length <= n) { return this; }
+         var subString = this.substring(0, n-1);
          return (useWordBoundary
-            ? subString.substr(0, subString.lastIndexOf(' '))
+            ? subString.substring(0, subString.lastIndexOf(' '))
             : subString) + (ellipsis ? "\u2026"  : "");
       };
