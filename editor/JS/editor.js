@@ -280,7 +280,7 @@ function Truncate(str, lenght){
 function ProcessRequestObj(str, elements){
     var result = JSON.parse(str);
     var el=document.getElementById("maDiv");
-    var i, j,tbl,tr, td,select, options;
+    var i, j,tbl,tr, td1,td2,select1,select2, options1,options2;
     el.innerHTML="";
     tbl=document.createElement("TABLE");
     tr = document.createElement("TR");
@@ -295,19 +295,40 @@ function ProcessRequestObj(str, elements){
             for (j=0;j<elements.length;j++) {
                 InsertColumn(tr, result[i][elements[j]]);
             }
-            td = document.createElement("TD");
-            select = document.createElement("SELECT");
-            options = ["non créé", "transporté", "porté"].concat(array);
-            options.forEach(optionText => {
+
+            td1 = document.createElement("TD");
+            select1 = document.createElement("SELECT");
+            options1 = ["Non créé","Transporté", "Porté"].concat(array);
+            options1.forEach(optionText => {
                 var option = document.createElement("OPTION");
                 option.value = optionText;
                 option.textContent = optionText;
-                select.appendChild(option);
+                select1.appendChild(option);
             });
-            td.appendChild(select);
-            tr.appendChild(td);
+            td1.appendChild(select1);
+            tr.appendChild(td1);
+
+            td2 = document.createElement("TD");
+
+            GetRoomArray(function (array2){
+
+                select2 = document.createElement("SELECT");
+                options2 = ["-----"].concat(array2);
+                options2.forEach(optionText => {
+                    var option = document.createElement("OPTION");
+                    option.value = optionText;
+                    option.textContent = optionText;
+                    select2.appendChild(option);
+                });
+                td2.appendChild(select2);
+                tr.appendChild(td2);
+
+
+            }, "PHP/GetVocab.php", "word");
+
             InsertImg(tr,"../img/icone-delete.png");
             InsertImg(tr,"../img/icone-edit.png");
+
             tbl.appendChild(tr)
         }
     }, "PHP/GetRoom.php", "roomdesc");
