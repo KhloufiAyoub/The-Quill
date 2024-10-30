@@ -3,13 +3,13 @@ session_start();
 include("Config.php");
 $dbh=new PDO($dbstr);
 
-if (isset($_POST["username"]) || isset($_POST["psw"])) {
+if (isset($_POST["username"]) && isset($_POST["psw"])) {
     $user = $_POST["username"];
     $pass = $_POST["psw"];
 
     $error=0;
 
-    if(preg_match("/<script/i",$user || preg_match("/<script/i",$pass))) {
+    if(preg_match("/<script/i",$user) || preg_match("/<script/i",$pass)) {
         $error++;
     }
 
@@ -22,7 +22,7 @@ if (isset($_POST["username"]) || isset($_POST["psw"])) {
         $stm->execute(array($user));
 
         if ($row=$stm->fetch()) {
-            if ($row["passwd"]==md5($pass)) {
+            if ($row["passwd"]==hash('sha256', $pass)) {
                 echo "success";
             }
             else{
@@ -30,7 +30,7 @@ if (isset($_POST["username"]) || isset($_POST["psw"])) {
             }
         }else{
             $stm=$dbh->prepare("INSERT INTO usr(login,passwd) VALUES (?,?)");
-            $stm->execute(array($user,md5($pass)));
+            $stm->execute(array($user, hash('sha256', $pass)));
             echo "success";
         }
     }
