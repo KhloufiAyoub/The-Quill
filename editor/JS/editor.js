@@ -184,12 +184,12 @@ function GetRoom(){
 
 function GetMessage(){
     var url="PHP/GetMessage.php";
-    Get(url,["mid","message"]);
+    Get(url,["mid","message"],true,true,true);
 }
 
 function GetSmsg(){
     var url="PHP/GetSmsg.php";
-    Get(url,["smid","message"], false, false)
+    Get(url,["smid","message"], false, false, true)
 }
 
 function GetMove(){
@@ -207,7 +207,7 @@ function GetObject(){
     var xhr= new XMLHttpRequest();
     xhr.onreadystatechange = function(){
         if (xhr.readyState === 4 && xhr.status === 200){
-            ProcessRequestObj(xhr.responseText,["objid","objdesc", "startloc"]);
+            ProcessRequestObj(xhr.responseText,["objid","objdesc"], ["startloc", "wid"]);
         }
     }
     xhr.open("POST",url,true);
@@ -224,19 +224,17 @@ function InsertImg(tr, source){
 
 function InsertColumn(tr, item, UseInnerHTML){
     var td = document.createElement("TD");
-    if (typeof item === "string") {
-        item = item.trunc(80, true, true);
-    }
+    var trunc_item = Truncate(item, 80);
     if (UseInnerHTML){
-        td.innerHTML=item;
+        td.innerHTML=trunc_item;
     }else {
-        var tn = document.createTextNode(item);
+        var tn = document.createTextNode(trunc_item);
         td.appendChild(tn);
     }
     tr.appendChild(td);
 }
 
-function ProcessRequest(str,elements, isDeletable=true, isEditable=true, UseInnerHTML=false){
+function ProcessRequest(str,elements, isDeletable, isEditable, UseInnerHTML){
     var result = JSON.parse(str);
     var el=document.getElementById("maDiv");
     var i,j,tbl,tr;
@@ -268,10 +266,10 @@ function ProcessRequest(str,elements, isDeletable=true, isEditable=true, UseInne
     el.appendChild(tbl);
 }
 
-function Truncate(str, lenght){
+function Truncate(str, length){
     if (typeof str === "string") {
-        if (str.length > lenght) {
-            str = str.substring(0, lenght) + "...";
+        if (str.length > length) {
+            str = str.substring(0, length) + "...";
         }
     }
     return str;
@@ -371,14 +369,18 @@ function InsertSelect(tr, array){
     tr.appendChild(td);
 }
 
-function ProcessRequestObj(str, elements) {
+function ProcessRequestObj(str, elements, elements2) {
+    var j;
     var result = JSON.parse(str);
     var el = document.getElementById("maDiv");
     el.innerHTML = "";
     var tbl = document.createElement("TABLE");
     var tr = document.createElement("TR");
-    for (var j = 0; j < elements.length; j++) {
+    for (j = 0; j < elements.length; j++) {
         InsertColumn(tr, elements[j]);
+    }
+    for (j = 0; j < elements2.length; j++) {
+        InsertColumn(tr, elements2[j]);
     }
     tbl.appendChild(tr);
 
@@ -413,7 +415,7 @@ function GetRoomArray(url, element) {
                 if (xhr.status === 200) {
                     var result = JSON.parse(xhr.responseText);
                     var array = result.map(function(item) {
-                        return item[element].trunc(20);
+                        return Truncate(item[element],20);
                     });
                     resolve(array);
                 } else {
