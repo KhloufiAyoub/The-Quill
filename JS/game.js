@@ -15,7 +15,7 @@ function initgame(){
     var xhr= new XMLHttpRequest();
     xhr.onreadystatechange = function(){
         if (xhr.readyState === 4 && xhr.status === 200){
-            connection(xhr.responseText);
+            login(xhr.responseText);
         }
     }
     xhr.open("POST",url,true);
@@ -23,30 +23,27 @@ function initgame(){
     xhr.send(param);
 }
 
-function connection(response){
+function login(response){
+    $("psw").value = "";
     if(response === "success"){
+        $("username").value = "";
         showGameScreen();
         console.log("Game started");
     }else if(response === "fail"){
-        $("psw").value = "";
         console.log("Password incorrect");
     }
     else{
-        $("psw").value = "";
         console.log("Game not started");
     }
 }
 
 function showGameScreen(){
-    $("psw").value = "";
-    $("username").value = "";
     hide("auth");
     show("game");
     $("gameInput").focus();
 }
 
 function endgame(){
-    console.log("Game ended");
     $("area").value = "";
     hide("game");
     show("auth");
