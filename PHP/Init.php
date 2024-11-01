@@ -9,3 +9,4 @@ $_SESSION["positionObj"]=[];
 $_SESSION["piece"]=0;
 $_SESSION["affichage"]="";
 $_SESSION["jeu"]="";
+$_SESSION["cmd"]="";

@@ -45,6 +45,7 @@ function showGameScreen(){
 
 function endgame(){
     $("area").value = "";
+    $("gameInput").value = "";
     hide("game");
     show("auth");
     $("username").focus();
@@ -65,13 +66,19 @@ function submitInput(){
     xhr.send(param);
 }
 
-function showCommand(response){
+function showCommand(str){
+    var result = JSON.parse(str);
     var area = $("area");
     var gameInput = $("gameInput");
-    if (response !== "problem") {
-        area.value += response + "\n";
-        area.scrollTop = area.scrollHeight;
+    for(var i = 0; i < result.length; i++) {
+        if (result[i]==="Game Over") {
+            endgame();
+            return;
+        }
+        area.value += result[i] + " ";
     }
+    area.value += "\n";
+    area.scrollTop = area.scrollHeight;
     gameInput.value = "";
     gameInput.focus();
 }
