@@ -31,7 +31,7 @@ function description(): void{
     $row=$stm->fetch();
     $_SESSION["etat_partie"]["jeu"]["etat_machine"]="getCommand";
     $_SESSION["etat_partie"]["affichage"][]=$row["roomdesc"];
-    echo json_encode(array("action"=>"TEXT", "str"=>$row["roomdesc"], "Clear"=>0));
+    echo json_encode(array("action"=>"TEXT", "str"=>$row["roomdesc"], "clear"=>1));
 }
 
 function getCommand(): void{
@@ -64,7 +64,7 @@ function decodeCommand(): void{
             $row=$stm->fetch();
             $_SESSION["etat_partie"]["jeu"]["etat_machine"]="getCommand";
             $_SESSION["etat_partie"]["affichage"][]=$row["smsg"];
-            echo json_encode(array("action"=>"TEXT", "str"=>$row["smsg"], "Clear"=>0));
+            echo json_encode(array("action"=>"TEXT", "str"=>$row["smsg"], "clear"=>0));
         }else{
             $stm=$dbh->prepare("SELECT newroom FROM move WHERE rid=? AND wid=?");
             $stm->execute(array($_SESSION["etat_partie"]["piece"], $words[0]));
@@ -82,7 +82,7 @@ function decodeCommand(): void{
                 $row=$stm->fetch();
                 $_SESSION["etat_partie"]["jeu"]["etat_machine"]="getCommand";
                 $_SESSION["etat_partie"]["affichage"][]=$row["smsg"];
-                echo json_encode(array("action"=>"TEXT", "str"=>$row["smsg"], "Clear"=>0));
+                echo json_encode(array("action"=>"TEXT", "str"=>$row["smsg"], "clear"=>0));
             }
         }
     }

@@ -1,5 +1,4 @@
 <?php
 session_start();
 
-//TODO: Implement this
-echo json_encode($_SESSION["etat_partie"]["affichage"]);
+echo json_encode(array("affichage"=>$_SESSION["etat_partie"]["affichage"]));

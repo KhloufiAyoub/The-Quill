@@ -53,14 +53,12 @@ function getAffichage(){
 
 function affichage(str){
     var result = JSON.parse(str);
-    console.log(result);
-    //TODO: afficher le tableau
+    var affichage = result["affichage"];
     var area = $("area");
-    for(var i = 0; i < result.length; i++) {
-        area.value += result[i] + "\n\n";
+    for(var i = 0; i < affichage.length; i++) {
+        area.value += affichage[i] + "\n\n";
     }
     area.scrollTop = area.scrollHeight;
-    $("gameInput").focus();
     stateMachine();
 }
 
@@ -68,7 +66,7 @@ function ProcessLogin(response){
     $("psw").value = "";
     if(response !== "error"){
         $("username").value = "";
-        loadGame()
+        loadGame();
     }
 }
 
@@ -92,7 +90,7 @@ function endgame(){
     var xhr= new XMLHttpRequest();
     xhr.onreadystatechange = function(){
         if (xhr.readyState === 4 && xhr.status === 200){
-            hideGameScreen()
+            hideGameScreen();
         }
     }
     xhr.open("POST",url,true);
@@ -100,49 +98,20 @@ function endgame(){
     xhr.send();
 }
 
-/**
-function submitInput(){
-    var gameInput = $("gameInput").value;
-    var url="PHP/AddCommand.php";
-    var param="gameInput="+encodeURIComponent(gameInput);
-    var param="gameInput="+encodeURIComponent(gameInput);
-    var xhr= new XMLHttpRequest();
-    xhr.onreadystatechange = function(){
-        if (xhr.readyState === 4 && xhr.status === 200){
-            showCommand(xhr.responseText);
-        }
-    }
-    xhr.open("POST",url,true);
-    xhr.setRequestHeader("Content-Type","application/x-www-form-urlencoded");
-    xhr.send(param);
-}
-
-function showCommand(str){
-    var result = JSON.parse(str);
-    var area = $("area");
-    var gameInput = $("gameInput");
-    for(var i = 0; i < result.length; i++) {
-        if (result[i]==="Game Over") {
-            endgame();
-            return;
-        }
-        area.value += result[i] + " ";
-    }
-    area.value += "\n";
-    area.scrollTop = area.scrollHeight;
-    gameInput.value = "";
-    gameInput.focus();
-}*/
-
 function action(str) {
     var result = JSON.parse(str);
-    console.log(result["action"]);
+    console.log(result);
     switch(result["action"]){
         case "CMD":
             $("submitInput").disabled = false;
+            $("gameInput").focus();
             break;
         case "TEXT":
-            showDesc(result["str"], result["clear"]);
+            if (result["clear"] === 1){
+                $("area").innerHTML = "";
+            }
+            showDesc(result["str"]);
+            stateMachine();
             break;
         case "RESET":
             reset();
@@ -153,14 +122,10 @@ function action(str) {
     }
 }
 
-function showDesc(str, clear){
+function showDesc(str){
     var area = $("area");
-    if(clear){
-        area.innerHTML = "";
-    }
-    area.innerHTML += str + "\n\n";
+    area.value += str + "\n\n";
     area.scrollTop = area.scrollHeight;
-    stateMachine();
 }
 
 function reset(){
@@ -188,7 +153,6 @@ function getCommand(){
             action(xhr.responseText);
             $("submitInput").disabled = true;
             gameInput.value = "";
-            gameInput.focus();
         }
     }
     xhr.open("POST",url,true);
