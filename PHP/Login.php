@@ -18,21 +18,25 @@ if (isset($_POST["username"]) && isset($_POST["psw"])) {
     }
 
     if($error==0){
-        $stm=$dbh->prepare("SELECT passwd FROM usr WHERE login=?");
+        $stm=$dbh->prepare("SELECT uid, passwd FROM usr WHERE login=?");
         $stm->execute(array($user));
 
         if ($row=$stm->fetch()) {
             if ($row["passwd"]==hash('sha256', $pass)) {
-                echo "success";
-            }
-            else{
-                echo "fail";
+                $_SESSION["uid"]=$row["uid"];
+            }else{
+                echo "error";
             }
         }else{
             $stm=$dbh->prepare("INSERT INTO usr(login,passwd) VALUES (?,?)");
             $stm->execute(array($user, hash('sha256', $pass)));
-            echo "success";
+            $_SESSION["uid"]=$dbh->lastInsertId();
+            $_SESSION["etat_partie"]["jeu"]["etat_machine"]="initialisation";
         }
+    }else{
+        echo "error";
     }
+}else{
+    echo "error";
 }
 

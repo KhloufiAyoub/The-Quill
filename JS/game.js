@@ -1,13 +1,15 @@
 init();
 
 function init(){
-    $("submit").onclick = initgame;
+    $("submit").onclick = login;
     $("logout").onclick = endgame;
-    $("submitInput").onclick = submitInput;
+    var submitInput = $("submitInput");
+    submitInput.onclick = getCommand;
+    submitInput.disabled = true;
     hide("game");
 }
 
-function initgame(){
+function login(){
     var username = $("username").value;
     var psw = $("psw").value;
     var url="PHP/Login.php";
@@ -15,7 +17,7 @@ function initgame(){
     var xhr= new XMLHttpRequest();
     xhr.onreadystatechange = function(){
         if (xhr.readyState === 4 && xhr.status === 200){
-            login(xhr.responseText);
+            ProcessLogin(xhr.responseText);
         }
     }
     xhr.open("POST",url,true);
@@ -23,17 +25,50 @@ function initgame(){
     xhr.send(param);
 }
 
-function login(response){
-    $("psw").value = "";
-    if(response === "success"){
-        $("username").value = "";
-        showGameScreen();
-        console.log("Game started");
-    }else if(response === "fail"){
-        console.log("Password incorrect");
+function loadGame(){
+    var url="PHP/Load.php";
+    var xhr= new XMLHttpRequest();
+    xhr.onreadystatechange = function(){
+        if (xhr.readyState === 4 && xhr.status === 200){
+            showGameScreen();
+        }
     }
-    else{
-        console.log("Game not started");
+    xhr.open("POST",url,true);
+    xhr.setRequestHeader("Content-Type","application/x-www-form-urlencoded");
+    xhr.send();
+}
+
+function getAffichage(){
+    var url="PHP/GetAffichage.php";
+    var xhr= new XMLHttpRequest();
+    xhr.onreadystatechange = function(){
+        if (xhr.readyState === 4 && xhr.status === 200){
+            affichage(xhr.responseText);
+        }
+    }
+    xhr.open("POST",url,true);
+    xhr.setRequestHeader("Content-Type","application/x-www-form-urlencoded");
+    xhr.send();
+}
+
+function affichage(str){
+    var result = JSON.parse(str);
+    console.log(result);
+    //TODO: afficher le tableau
+    var area = $("area");
+    for(var i = 0; i < result.length; i++) {
+        area.value += result[i] + "\n\n";
+    }
+    area.scrollTop = area.scrollHeight;
+    $("gameInput").focus();
+    stateMachine();
+}
+
+function ProcessLogin(response){
+    $("psw").value = "";
+    if(response !== "error"){
+        $("username").value = "";
+        loadGame()
     }
 }
 
@@ -41,9 +76,10 @@ function showGameScreen(){
     hide("auth");
     show("game");
     $("gameInput").focus();
+    getAffichage();
 }
 
-function endgame(){
+function hideGameScreen(){
     $("area").value = "";
     $("gameInput").value = "";
     hide("game");
@@ -51,9 +87,24 @@ function endgame(){
     $("username").focus();
 }
 
+function endgame(){
+    var url="PHP/Save.php";
+    var xhr= new XMLHttpRequest();
+    xhr.onreadystatechange = function(){
+        if (xhr.readyState === 4 && xhr.status === 200){
+            hideGameScreen()
+        }
+    }
+    xhr.open("POST",url,true);
+    xhr.setRequestHeader("Content-Type","application/x-www-form-urlencoded");
+    xhr.send();
+}
+
+/**
 function submitInput(){
     var gameInput = $("gameInput").value;
     var url="PHP/AddCommand.php";
+    var param="gameInput="+encodeURIComponent(gameInput);
     var param="gameInput="+encodeURIComponent(gameInput);
     var xhr= new XMLHttpRequest();
     xhr.onreadystatechange = function(){
@@ -81,4 +132,80 @@ function showCommand(str){
     area.scrollTop = area.scrollHeight;
     gameInput.value = "";
     gameInput.focus();
+}*/
+
+function action(str) {
+    var result = JSON.parse(str);
+    console.log(result["action"]);
+    switch(result["action"]){
+        case "CMD":
+            $("submitInput").disabled = false;
+            break;
+        case "TEXT":
+            showDesc(result["str"], result["clear"]);
+            break;
+        case "RESET":
+            reset();
+            break;
+        case "NOP":
+            stateMachine();
+            break;
+    }
+}
+
+function showDesc(str, clear){
+    var area = $("area");
+    if(clear){
+        area.innerHTML = "";
+    }
+    area.innerHTML += str + "\n\n";
+    area.scrollTop = area.scrollHeight;
+    stateMachine();
+}
+
+function reset(){
+    var url="PHP/Init.php";
+    var xhr= new XMLHttpRequest();
+    xhr.onreadystatechange = function(){
+        if (xhr.readyState === 4 && xhr.status === 200){
+            stateMachine();
+        }
+    }
+    xhr.open("POST",url,true);
+    xhr.setRequestHeader("Content-Type","application/x-www-form-urlencoded");
+    xhr.send();
+}
+
+function getCommand(){
+    console.log("getCommand");
+    var gameInput = $("gameInput");
+    var command = gameInput.value;
+    var url="PHP/Command.php";
+    var param="command="+encodeURIComponent(command);
+    var xhr= new XMLHttpRequest();
+    xhr.onreadystatechange = function(){
+        if (xhr.readyState === 4 && xhr.status === 200){
+            action(xhr.responseText);
+            $("submitInput").disabled = true;
+            gameInput.value = "";
+            gameInput.focus();
+        }
+    }
+    xhr.open("POST",url,true);
+    xhr.setRequestHeader("Content-Type","application/x-www-form-urlencoded");
+    xhr.send(param);
+
+}
+
+function stateMachine(){
+    var url="PHP/Command.php";
+    var xhr= new XMLHttpRequest();
+    xhr.onreadystatechange = function(){
+        if (xhr.readyState === 4 && xhr.status === 200){
+            action(xhr.responseText);
+        }
+    }
+    xhr.open("POST",url,true);
+    xhr.setRequestHeader("Content-Type","application/x-www-form-urlencoded");
+    xhr.send();
 }
