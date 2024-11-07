@@ -274,86 +274,6 @@ function Truncate(str, length){
     }
     return str;
 }
-/**
-function ProcessRequestObj(str, elements){
-    var result = JSON.parse(str);
-    var el=document.getElementById("maDiv");
-    var i, j,tbl,tr, td1,td2,select1,select2, options1,options2;
-    el.innerHTML="";
-    tbl=document.createElement("TABLE");
-    tr = document.createElement("TR");
-    for (j=0;j<elements.length;j++){
-        InsertColumn(tr, elements[j]);
-    }
-    tbl.appendChild(tr);
-
-    GetRoomArray(function (array) {
-        for(i=0;i<result.length;i++) {
-            tr=document.createElement("TR");
-            for (j=0;j<elements.length;j++) {
-                InsertColumn(tr, result[i][elements[j]]);
-            }
-
-            td1 = document.createElement("TD");
-            select1 = document.createElement("SELECT");
-            options1 = ["Non créé","Transporté", "Porté"].concat(array);
-            options1.forEach(optionText => {
-                var option = document.createElement("OPTION");
-                option.value = optionText;
-                option.textContent = optionText;
-                select1.appendChild(option);
-            });
-            td1.appendChild(select1);
-            tr.appendChild(td1);
-
-            td2 = document.createElement("TD");
-
-            GetRoomArray(function (array2){
-
-                select2 = document.createElement("SELECT");
-                options2 = ["-----"].concat(array2);
-                options2.forEach(optionText => {
-                    var option = document.createElement("OPTION");
-                    option.value = optionText;
-                    option.textContent = optionText;
-                    select2.appendChild(option);
-                });
-                td2.appendChild(select2);
-                tr.appendChild(td2);
-
-
-            }, "PHP/GetVocab.php", "word");
-
-            InsertImg(tr,"../img/icone-delete.png");
-            InsertImg(tr,"../img/icone-edit.png");
-
-            tbl.appendChild(tr)
-        }
-    }, "PHP/GetRoom.php", "roomdesc");
-    el.appendChild(tbl);
-}
-
-function GetRoomArray(callback, url,element) {
-    var xhr = new XMLHttpRequest();
-    xhr.onreadystatechange = function () {
-        if (xhr.readyState === 4 && xhr.status === 200) {
-            // Fonction imbriquée pour traiter la réponse
-            function ProcessRequestRoomArray(str, element) {
-                var result = JSON.parse(str);
-                var array = [];
-                for (let i = 0; i < result.length; i++) {
-                    array.push(Truncate(result[i][element], 20));
-                }
-                return array;
-            }
-            // Appel de la fonction imbriquée avec les données nécessaires
-            var array = ProcessRequestRoomArray(xhr.responseText, element);
-            callback(array); // Exécute la fonction de rappel avec le tableau obtenu
-        }
-    };
-    xhr.open("POST", url, true);
-    xhr.send();
-}*/
 
 function InsertSelect(tr, array){
     var td = document.createElement("TD");
@@ -390,9 +310,14 @@ function ProcessRequestObj(str, elements, elements2) {
             InsertColumn(tr, item[element]);
         });
 
+        /**
+         * On avait fait une fonction pour récupérer les données des salles et du vocabulaire
+         * mais lors de l'affichage, les select n'étaient pas tout le temps dans le bon ordre
+         * On a donc décidé de regarder sur internet comment faire une promesse pour attendre que les deux tableaux soient chargés
+         */
         Promise.all([
-            GetRoomArray("PHP/GetRoom.php", "roomdesc"),
-            GetRoomArray("PHP/GetVocab.php", "word")
+            GetValueArray("PHP/GetRoom.php", "roomdesc"),
+            GetValueArray("PHP/GetVocab.php", "word")
         ]).then(function(arrays) {
             var location=["Non créé","Transporté", "Porté"].concat(arrays[0]);
             var vocab = ["-----"].concat(arrays[1]);
@@ -407,7 +332,7 @@ function ProcessRequestObj(str, elements, elements2) {
     el.appendChild(tbl);
 }
 
-function GetRoomArray(url, element) {
+function GetValueArray(url, element) {
     return new Promise(function(resolve, reject) {
         var xhr = new XMLHttpRequest();
         xhr.onreadystatechange = function() {

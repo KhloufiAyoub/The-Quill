@@ -1,11 +1,13 @@
 init();
 
 function init(){
-    $("submit").onclick = login;
-    $("logout").onclick = endgame;
+    var logout = $("logout");
     var submitInput = $("submitInput");
+    $("submit").onclick = login;
+    logout.onclick = endgame;
     submitInput.onclick = getCommand;
     submitInput.disabled = true;
+    logout.disabled = true;
     hide("game");
 }
 
@@ -98,19 +100,26 @@ function endgame(){
     xhr.send();
 }
 
+function clearArea(){
+    $("area").innerHTML = "";
+}
+
 function action(str) {
     var result = JSON.parse(str);
-    console.log(result);
     switch(result["action"]){
         case "CMD":
             $("submitInput").disabled = false;
+            $("logout").disabled = false;
             $("gameInput").focus();
             break;
+        case "CLEAR":
+            clearArea();
+            stateMachine();
+            break;
         case "TEXT":
-            if (result["clear"] === 1){
-                $("area").innerHTML = "";
-            }
-            showDesc(result["str"]);
+            var area = $("area");
+            area.value += result["str"] + "\n\n";
+            area.scrollTop = area.scrollHeight;
             stateMachine();
             break;
         case "RESET":
@@ -122,11 +131,6 @@ function action(str) {
     }
 }
 
-function showDesc(str){
-    var area = $("area");
-    area.value += str + "\n\n";
-    area.scrollTop = area.scrollHeight;
-}
 
 function reset(){
     var url="PHP/Init.php";
@@ -142,7 +146,8 @@ function reset(){
 }
 
 function getCommand(){
-    console.log("getCommand");
+    $("submitInput").disabled = true;
+    $("logout").disabled = true;
     var gameInput = $("gameInput");
     var command = gameInput.value;
     var url="PHP/Command.php";
@@ -151,7 +156,6 @@ function getCommand(){
     xhr.onreadystatechange = function(){
         if (xhr.readyState === 4 && xhr.status === 200){
             action(xhr.responseText);
-            $("submitInput").disabled = true;
             gameInput.value = "";
         }
     }
