@@ -100,12 +100,9 @@ function endgame(){
     xhr.send();
 }
 
-function clearArea(){
-    $("area").innerHTML = "";
-}
-
 function action(str) {
     var result = JSON.parse(str);
+    var area = $("area");
     switch(result["action"]){
         case "CMD":
             $("submitInput").disabled = false;
@@ -113,11 +110,10 @@ function action(str) {
             $("gameInput").focus();
             break;
         case "CLEAR":
-            clearArea();
+            area.value  = "";
             stateMachine();
             break;
         case "TEXT":
-            var area = $("area");
             area.value += result["str"] + "\n\n";
             area.scrollTop = area.scrollHeight;
             stateMachine();
