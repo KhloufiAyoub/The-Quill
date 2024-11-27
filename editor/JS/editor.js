@@ -214,6 +214,7 @@ function GetObject(){
     xhr.send();
 }
 
+//TODO: closure pour avoir l'id dans le onclick et séparer les images d'édition et de suppression
 function InsertImg(tr, source){
     var img = document.createElement("IMG");
     var td = document.createElement("TD");
@@ -222,6 +223,7 @@ function InsertImg(tr, source){
     tr.appendChild(td);
 }
 
+//TODO : Pas de InnerHTML
 function InsertColumn(tr, item, UseInnerHTML){
     var td = document.createElement("TD");
     var trunc_item = Truncate(item, 80);
@@ -275,6 +277,7 @@ function Truncate(str, length){
     return str;
 }
 
+//TODO : select réagit avec l'id de la ligne dans une closure, avec avec .onchanged = function(ev){target = ev.target}
 function InsertSelect(tr, array){
     var td = document.createElement("TD");
     var select = document.createElement("SELECT");
@@ -282,7 +285,7 @@ function InsertSelect(tr, array){
     for (i = 0; i < array.length; i++) {
         var option = document.createElement("OPTION");
         option.value = array[i];
-        option.textContent = array[i];
+        option.text = array[i];
         select.appendChild(option);
     }
     td.appendChild(select);
@@ -311,9 +314,9 @@ function ProcessRequestObj(str, elements, elements2) {
         });
 
         /**
-         * On avait fait une fonction pour récupérer les données des salles et du vocabulaire
-         * mais lors de l'affichage, les select n'étaient pas tout le temps dans le bon ordre
-         * On a donc décidé de regarder sur internet comment faire une promesse pour attendre que les deux tableaux soient chargés
+         * On avait fait une fonction pour récupérer les données des salles et du vocabulaire,
+         * mais lors de l'affichage, les selects n'étaient pas tout le temps dans le bon ordre
+         * On a donc décidé de regarder sur internet comment faire une promesse pour attendre que les deux tableaux soient chargés.
          */
         Promise.all([
             GetValueArray("PHP/GetRoom.php", "roomdesc"),
@@ -340,7 +343,7 @@ function GetValueArray(url, element) {
                 if (xhr.status === 200) {
                     var result = JSON.parse(xhr.responseText);
                     var array = result.map(function(item) {
-                        return Truncate(item[element],20);
+                        return Truncate(item[element],30);
                     });
                     resolve(array);
                 } else {
