@@ -367,23 +367,7 @@ function InsertEditHelper(id, table, promptvalue) {
             var xhr = new XMLHttpRequest();
             xhr.onreadystatechange = function() {
                 if (xhr.readyState === 4 && xhr.status === 200) {
-                    switch (xhr.responseText) {
-                        case "piece":
-                            GetRoom();
-                            break;
-                        case "message":
-                            GetMessage();
-                            break;
-                        case "deplacement":
-                            GetMove();
-                            break;
-                        case "vocab":
-                            GetVocab();
-                            break;
-                        case "objet":
-                            GetObject();
-                            break;
-                    }
+                    Refresh(xhr.response)
                 }
             };
             xhr.open("POST", url, true);
@@ -411,28 +395,32 @@ function InsertDeleteHelper(id1, id2, table){
         var xhr= new XMLHttpRequest();
         xhr.onreadystatechange = function(){
             if (xhr.readyState === 4 && xhr.status === 200){
-                switch(xhr.responseText){
-                    case "piece":
-                        GetRoom();
-                        break;
-                    case "message":
-                        GetMessage();
-                        break;
-                    case "deplacement":
-                        GetMove();
-                        break;
-                    case "vocab":
-                        GetVocab();
-                        break;
-                    case "objet":
-                        GetObject();
-                        break;
-                }
+                Refresh(xhr.response)
             }
         }
         xhr.open("POST",url,true);
         xhr.setRequestHeader("Content-Type","application/x-www-form-urlencoded");
         xhr.send(param);
+    }
+}
+
+function Refresh (str){
+    switch(str){
+        case "piece":
+            GetRoom();
+            break;
+        case "message":
+            GetMessage();
+            break;
+        case "deplacement":
+            GetMove();
+            break;
+        case "vocab":
+            GetVocab();
+            break;
+        case "objet":
+            GetObject();
+            break;
     }
 }
 
