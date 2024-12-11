@@ -5,7 +5,7 @@ $dbh=new PDO($dbstr);
 
 $a =[];
 
-$stm=$dbh->prepare("SELECT mid, message FROM msg");
+$stm=$dbh->prepare("SELECT mid, message FROM msg ORDER BY mid");
 $stm->execute();
 
 while ($row=$stm->fetch()){

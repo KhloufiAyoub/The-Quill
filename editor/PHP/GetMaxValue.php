@@ -9,6 +9,6 @@ $stm=$dbh->prepare("SELECT value FROM params order by param");
 $stm->execute();
 
 while($row=$stm->fetch()){
-    $result = $result . "" . $row["value"] . ",";
+    $result = $result . $row["value"] . ",";
 }
 echo $result;

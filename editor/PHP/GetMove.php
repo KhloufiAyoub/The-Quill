@@ -5,7 +5,7 @@ $dbh=new PDO($dbstr);
 
 $a =[];
 
-$stm=$dbh->prepare("SELECT rid, wid, newroom FROM move");
+$stm=$dbh->prepare("SELECT rid, wid, newroom FROM move ORDER BY rid, wid");
 $stm->execute();
 
 while ($row=$stm->fetch()){

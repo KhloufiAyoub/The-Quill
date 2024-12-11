@@ -5,7 +5,7 @@ $dbh=new PDO($dbstr);
 
 $a =[];
 
-$stm=$dbh->prepare("SELECT wid,word FROM vocab");
+$stm=$dbh->prepare("SELECT wid,word FROM vocab ORDER BY wid");
 $stm->execute();
 
 while ($row=$stm->fetch()){

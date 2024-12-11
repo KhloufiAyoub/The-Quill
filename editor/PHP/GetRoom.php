@@ -5,7 +5,7 @@ $dbh=new PDO($dbstr);
 
 $a =[];
 
-$stm=$dbh->prepare("SELECT rid, roomdesc FROM location");
+$stm=$dbh->prepare("SELECT rid, roomdesc FROM location ORDER BY rid");
 $stm->execute();
 
 while ($row=$stm->fetch()){
