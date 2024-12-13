@@ -1,4 +1,5 @@
 init();
+setInterval(startSession, 180000);
 
 function init(){
     var logout = $("logout");
@@ -171,5 +172,13 @@ function stateMachine(){
     }
     xhr.open("POST",url,true);
     xhr.setRequestHeader("Content-Type","application/x-www-form-urlencoded");
+    xhr.send();
+}
+
+function startSession() {
+    var url = "PHP/SessionStart.php";
+    var xhr = new XMLHttpRequest();
+    xhr.open("POST", url, true);
+    xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
     xhr.send();
 }
