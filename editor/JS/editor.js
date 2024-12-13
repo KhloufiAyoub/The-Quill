@@ -306,34 +306,36 @@ function ProcessRequestObj(str, elements, elements2, promptvalue) {
     }
     tbl.appendChild(tr);
 
-    result.forEach(function(item) {
+    result.forEach(function(item) {  //chaque ligne du resultat
         var tr = document.createElement("TR");
         var td = document.createElement("TD");
         for (j=0;j<elements.length-1;j++) {
             InsertColumn(tr, item[elements[j]]);
         }
-
         Promise.all([
             GetValueArray("PHP/GetRoom.php"),
-            GetValueArray("PHP/GetVocab.php")
+            GetValueArray("PHP/GetVocab.php"),
+            GetValueArray("PHP/GetObjSelected.php", item[elements[0]])
         ]).then(function(arrays) {
-            InsertSelect(td, arrays[0], "roomdesc", "rid", true, ["Non créé","Transporté", "Porté"]);
+            var locations = {"Non cree": -1, "Porte": -2, "Transporte": -3};
+            var words = {"-----": null}
+            InsertSelect(td, arrays[0], "roomdesc", "rid", true,arrays[2]["startloc"], locations, item[elements[0]], "ObjetSelectRoom");
             tr.appendChild(td);
             td = document.createElement("TD");
-            InsertSelect(td, arrays[1], "word", "wid", true, ["-----"]);
+            InsertSelect(td, arrays[1], "word", "wid", true, arrays[2]["wid"],words, item[elements[0]], "ObjetSelectWord");
             tr.appendChild(td);
             InsertDeleteImg(tr, item[elements[0]], elements[elements.length-1]);
             InsertEditImg(tr, item[elements[0]], elements[elements.length-1], promptvalue);
             tbl.appendChild(tr);
         });
     });
-
     el.appendChild(tbl);
 } // a revoir
 
-function GetValueArray(url) {
+function GetValueArray(url, id=null){
     return new Promise(function(resolve, reject) {
         var xhr = new XMLHttpRequest();
+        var param = "id=" + encodeURIComponent(id);
         xhr.onreadystatechange = function() {
             if (xhr.readyState === 4) {
                 if (xhr.status === 200) {
@@ -344,10 +346,12 @@ function GetValueArray(url) {
                 }
             }
         };
-        xhr.open("POST", url, true)
-        xhr.send();
+        xhr.open("POST", url, true);
+        xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+        xhr.send(param);
     });
 }
+
 
 function InsertEditImg(tr,id, table, promptvalue){
     var img = document.createElement("IMG");
@@ -440,32 +444,54 @@ function InsertColumn(tr, item, UseInnerHTML){
 
 //TODO : select réagit avec l'id de la ligne dans une closure, avec avec .onchanged = function(ev){target = ev.target}
 
+function InsertSelectHelper(table, id){
+    return function(ev){
+        var target = ev.target;
+        var url = "PHP/Edit.php";
+        var param = "id1=" + encodeURIComponent(id) + "&table=" + encodeURIComponent(table) + "&newValue=" + encodeURIComponent(target.value);
+        var xhr = new XMLHttpRequest();
+        xhr.onreadystatechange = function() {
+            if (xhr.readyState === 4 && xhr.status === 200) {
+                Refresh(xhr.response)
+            }
+        };
+        xhr.open("POST", url, true);
+        xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+        xhr.send(param);
+    }
+}
 
-function InsertSelect(td, array, text, value, onChanged, moreOption=[], id=null){
 
+function InsertSelect(td, array, text, value, onChanged,selected, moreOption=[], id=null, table = null){
     var select = document.createElement("SELECT");
     if (onChanged){
-
+        select.onchange = InsertSelectHelper(table,id);
     }else{
         select.id = id;
     }
-
     var i;
     var option = document.createElement("OPTION");
-    for (i=0; i<moreOption.length; i++){
+    for (i in moreOption){
         option = document.createElement("OPTION");
+        option.text = i;
         option.value = moreOption[i];
-        option.text = moreOption[i];
+        if (selected === null || selected === moreOption[i]) {
+            option.selected = true;
+        }
         select.appendChild(option);
     }
     for (i = 0; i < array.length; i++) {
         option = document.createElement("OPTION");
         option.value = array[i][value];
         option.text = String(array[i][text]).trunc(30, " ", true);
+        if(selected === array[i][value]){
+            option.selected = true;
+        }
         select.appendChild(option);
     }
     td.appendChild(select);
 }
+
 
 
 

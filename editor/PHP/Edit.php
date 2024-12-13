@@ -23,5 +23,18 @@ if (isset($_POST["id1"]) && isset($_POST["table"]) && isset($_POST["newValue"]))
             $stm->execute(array($newValue, $id1));
             echo "objet";
             break;
+        case "ObjetSelectRoom":
+            $stm=$dbh->prepare("UPDATE obj SET startloc=? WHERE objid=?");
+            $stm->execute(array($newValue, $id1));
+            echo "objet";
+            break;
+        case "ObjetSelectWord":
+            if ($newValue == "null"){
+                $newValue = null;
+            }
+            $stm=$dbh->prepare("UPDATE obj SET wid=? WHERE objid=?");
+            $stm->execute(array($newValue, $id1));
+            echo "objet";
+            break;
     }
 }

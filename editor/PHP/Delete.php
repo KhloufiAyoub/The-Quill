@@ -15,6 +15,10 @@ if (isset($_POST["id1"]) && isset($_POST["table"])){
         case "Piece":
             $stm=$dbh->prepare("DELETE FROM location WHERE rid=?");
             $stm->execute(array($id1));
+            $stm=$dbh->prepare("DELETE FROM move WHERE rid=?");
+            $stm->execute(array($id1));
+            $stm=$dbh->prepare("UPDATE obj SET startloc=-1 WHERE startloc=?");
+            $stm->execute(array($id1));
             echo "piece";
             break;
         case "Deplacement":
