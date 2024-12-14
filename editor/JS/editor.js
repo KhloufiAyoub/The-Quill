@@ -31,6 +31,7 @@ function init(){
     $("GetMove").onclick = GetMove;
     $("GetObject").onclick = GetObject;
     $("GetVocab").onclick = GetVocab;
+    $("GetAction").onclick = GetAction;
 
     GetMaxValue();
 }
@@ -259,6 +260,12 @@ function GetVocab(){
     var url="PHP/GetVocab.php";
     Get(url,["wid","word"], "Vocab", null, true,false)
 }
+
+function GetAction(){
+    var url="PHP/GetAction.php";
+    Get(url,["tbl","wid1", "wid2", "pgm"], "Action", null, true,true)
+}
+
 
 function ProcessRequest(str,elements,table, promptvalue, isDeletable, isEditable, UseInnerHTML){
     var result = JSON.parse(str);
