@@ -6,7 +6,7 @@ function init(){
     $("ObjButton").onclick = ShowObject;
     $("MoveButton").onclick = ShowMove;
     $("VocabButton").onclick = ShowVocab;
-
+    $("ActionButton").onclick = ShowAction;
 
     $("RoomSubmit").onclick = AddRoom;
     $("RoomCancel").onclick = function () {hide("AddRoom");};
@@ -18,6 +18,8 @@ function init(){
     $("VocabCancel").onclick = function () {hide("AddVocab");};
     $("MoveSubmit").onclick = AddMove;
     $("MoveCancel").onclick = function () {hide("AddMove");};
+    $("ActionSubmit").onclick = AddAction; //TODO : A faire
+    $("ActionCancel").onclick = function () {hide("AddAction");};
 
     $("submitWord").onclick = EditWord; // reverif
     $("submitObj").onclick = EditObj;
@@ -32,12 +34,14 @@ function init(){
 
     GetMaxValue();
 }
+//TODO : Tableau d'instructions et de conditions
 
 function ShowRoom(){
     hide("AddMsg");
     hide("AddObj");
     hide("AddVocab");
     hide("AddMove");
+    hide("AddAction");
     show("AddRoom");
 }
 
@@ -46,6 +50,7 @@ function ShowMessage(){
     hide("AddObj");
     hide("AddVocab");
     hide("AddMove");
+    hide("AddAction");
     show("AddMsg");
 }
 
@@ -54,6 +59,7 @@ function ShowObject(){
     hide("AddMsg");
     hide("AddVocab");
     hide("AddMove");
+    hide("AddAction");
     show("AddObj");
 }
 
@@ -62,7 +68,17 @@ function ShowVocab(){
     hide("AddMsg");
     hide("AddObj");
     hide("AddMove");
+    hide("AddAction");
     show("AddVocab");
+}
+
+function ShowAction(){
+    hide("AddRoom");
+    hide("AddMsg");
+    hide("AddObj");
+    hide("AddMove");
+    hide("AddVocab");
+    show("AddAction");
 }
 
 function ShowMove(){
@@ -70,6 +86,7 @@ function ShowMove(){
     hide("AddMsg");
     hide("AddObj");
     hide("AddVocab");
+    hide("AddAction");
     show("AddMove");
 
     var maDiv = $("MoveSelect");
@@ -207,11 +224,11 @@ function SplitValue(response){
     $("maxSave").value=split[1];
 }
 
-function Get(url, elements, promptvalue= null, isDeletable=true, isEditable=true, UseInnerHTML=false){
+function Get(url, elements,table, promptvalue= null, isDeletable=true, isEditable=true, UseInnerHTML=false){
     var xhr= new XMLHttpRequest();
     xhr.onreadystatechange = function(){
         if (xhr.readyState === 4 && xhr.status === 200){
-            ProcessRequest(xhr.responseText, elements, promptvalue, isDeletable, isEditable, UseInnerHTML);
+            ProcessRequest(xhr.responseText, elements,table, promptvalue, isDeletable, isEditable, UseInnerHTML);
         }
     }
     xhr.open("POST",url,true);
@@ -220,30 +237,30 @@ function Get(url, elements, promptvalue= null, isDeletable=true, isEditable=true
 
 function GetRoom(){
     var url="PHP/GetRoom.php";
-    Get(url,["rid","roomdesc", "Piece"],"Nouvelle description de la pièce :" ,true,true,true);
+    Get(url,["rid","roomdesc"], "Piece","Nouvelle description de la pièce :" ,true,true,true);
 }
 
 function GetMessage(){
     var url="PHP/GetMessage.php";
-    Get(url,["mid","message", "Message"], "Nouveau message :",true,true,true);
+    Get(url,["mid","message"],"Message", "Nouveau message :",true,true,true);
 }
 
 function GetSmsg(){
     var url="PHP/GetSmsg.php";
-    Get(url,["smid","message", "SMessage"], null,false, false, true)
+    Get(url,["smid","message"], "SMessage",null,false, false, true)
 }
 
 function GetMove(){
     var url="PHP/GetMove.php";
-    Get(url,["rid","word", "newroom", "Deplacement"],null , true,false)
+    Get(url,["rid","word", "newroom"],"Deplacement",null , true,false)
 }
 
 function GetVocab(){
     var url="PHP/GetVocab.php";
-    Get(url,["wid","word", "Vocab"], null, true,false)
+    Get(url,["wid","word"], "Vocab", null, true,false)
 }
 
-function ProcessRequest(str,elements, promptvalue, isDeletable, isEditable, UseInnerHTML){
+function ProcessRequest(str,elements,table, promptvalue, isDeletable, isEditable, UseInnerHTML){
     var result = JSON.parse(str);
     var el=document.getElementById("maDiv");
     var i,j,tbl,tr;
@@ -251,7 +268,7 @@ function ProcessRequest(str,elements, promptvalue, isDeletable, isEditable, UseI
     tbl=document.createElement("TABLE");
     //Entête du tableau
     tr = document.createElement("TR");
-    for (j=0;j<elements.length-1;j++){
+    for (j=0;j<elements.length;j++){
         InsertColumn(tr, elements[j]);
     }
     tbl.appendChild(tr);
@@ -259,20 +276,23 @@ function ProcessRequest(str,elements, promptvalue, isDeletable, isEditable, UseI
     for(i=0;i<result.length;i++) {
         tr=document.createElement("TR");
         //Insertion des colonnes
-        for (j=0;j<elements.length-1;j++) {
+        for (j=0;j<elements.length;j++) {
             InsertColumn(tr, result[i][elements[j]],UseInnerHTML);
         }
+        var id = result[i][elements[0]];
         //Insertion des images de suppression
         if (isDeletable) {
-            if(elements[elements.length-1] === "Deplacement") {
-                InsertDeleteImg(tr, result[i][elements[0]],  elements[elements.length-1], result[i][elements[1]])
-            }else{
-                InsertDeleteImg(tr, result[i][elements[0]], elements[elements.length-1]);
+            if(table === "Deplacement") {
+                InsertDeleteImg(tr, id, table, result[i][elements[1]])
+            }else if(table === "Action"){
+                InsertDeleteImg(tr, id, table, result[i][elements[1]], result[i][elements[2]])
+            }else {
+                InsertDeleteImg(tr, id, table);
             }
         }
         //Insertion des images d'édition
         if (isEditable) {
-            InsertEditImg(tr, result[i][elements[0]], elements[elements.length-1], promptvalue);
+            InsertEditImg(tr, id, table, promptvalue);
         }
         tbl.appendChild(tr)
     }
@@ -284,21 +304,21 @@ function GetObject(){
     var xhr= new XMLHttpRequest();
     xhr.onreadystatechange = function(){
         if (xhr.readyState === 4 && xhr.status === 200){
-            ProcessRequestObj(xhr.responseText,["objid","objdesc", "Objet"], ["startloc", "wid"], "Nouveau nom de l'objet :");
+            ProcessRequestObj(xhr.responseText,["objid","objdesc"], ["startloc", "wid"], "Objet", "Nouveau nom de l'objet :");
         }
     }
     xhr.open("POST",url,true);
     xhr.send();
 }
 
-function ProcessRequestObj(str, elements, elements2, promptvalue) {
+function ProcessRequestObj(str, elements, elements2, table, promptvalue) {
     var j;
     var result = JSON.parse(str);
     var el = document.getElementById("maDiv");
     el.innerHTML = "";
     var tbl = document.createElement("TABLE");
     var tr = document.createElement("TR");
-    for (j = 0; j < elements.length-1; j++) {
+    for (j = 0; j < elements.length; j++) {
         InsertColumn(tr, elements[j]);
     }
     for (j = 0; j < elements2.length; j++) {
@@ -309,7 +329,7 @@ function ProcessRequestObj(str, elements, elements2, promptvalue) {
     result.forEach(function(item) {  //chaque ligne du resultat
         var tr = document.createElement("TR");
         var td = document.createElement("TD");
-        for (j=0;j<elements.length-1;j++) {
+        for (j=0;j<elements.length;j++) {
             InsertColumn(tr, item[elements[j]]);
         }
         Promise.all([
@@ -317,20 +337,22 @@ function ProcessRequestObj(str, elements, elements2, promptvalue) {
             GetValueArray("PHP/GetVocab.php"),
             GetValueArray("PHP/GetObjSelected.php", item[elements[0]])
         ]).then(function(arrays) {
+            var id = item[elements[0]];
             var locations = {"Non cree": -1, "Porte": -2, "Transporte": -3};
             var words = {"-----": null}
-            InsertSelect(td, arrays[0], "roomdesc", "rid", true,arrays[2]["startloc"], locations, item[elements[0]], "ObjetSelectRoom");
+            InsertSelect(td, arrays[0], "roomdesc", "rid", true,arrays[2]["startloc"], locations, id, "ObjetSelectRoom");
             tr.appendChild(td);
             td = document.createElement("TD");
-            InsertSelect(td, arrays[1], "word", "wid", true, arrays[2]["wid"],words, item[elements[0]], "ObjetSelectWord");
+            InsertSelect(td, arrays[1], "word", "wid", true, arrays[2]["wid"],words, id, "ObjetSelectWord");
             tr.appendChild(td);
-            InsertDeleteImg(tr, item[elements[0]], elements[elements.length-1]);
-            InsertEditImg(tr, item[elements[0]], elements[elements.length-1], promptvalue);
+            InsertDeleteImg(tr, id, table);
+            InsertEditImg(tr, id, table, promptvalue);
             tbl.appendChild(tr);
         });
     });
     el.appendChild(tbl);
 } // a revoir
+
 
 function GetValueArray(url, id=null){
     return new Promise(function(resolve, reject) {
@@ -381,20 +403,22 @@ function InsertEditHelper(id, table, promptvalue) {
     };
 }
 
-function InsertDeleteImg(tr, id1, table, id2=null){
+function InsertDeleteImg(tr, id1, table, id2=null, id3=null){
     var img = document.createElement("IMG");
     var td = document.createElement("TD");
     img.src="../img/icone-delete.png";
-    img.onclick =  InsertDeleteHelper(id1, id2, table)
+    img.onclick =  InsertDeleteHelper(id1, id2,id3, table)
     td.appendChild(img);
     tr.appendChild(td);
 }
 
-function InsertDeleteHelper(id1, id2, table){
+function InsertDeleteHelper(id1, id2, id3, table){
     return function(){
         var url="PHP/Delete.php";
+        console.log(id1,id2,id3,table);
         var param="id1="+encodeURIComponent(id1)
         param = param + "&id2=" + encodeURIComponent(id2)
+        param = param + "&id3=" + encodeURIComponent(id3)
         param = param + "&table=" + encodeURIComponent(table)
         var xhr= new XMLHttpRequest();
         xhr.onreadystatechange = function(){
@@ -425,6 +449,9 @@ function Refresh (str){
         case "objet":
             GetObject();
             break;
+        case "action":
+            GetAction();
+            break;
     }
 }
 
@@ -442,13 +469,13 @@ function InsertColumn(tr, item, UseInnerHTML){
     tr.appendChild(td);
 }
 
-//TODO : select réagit avec l'id de la ligne dans une closure, avec avec .onchanged = function(ev){target = ev.target}
-
 function InsertSelectHelper(table, id){
     return function(ev){
         var target = ev.target;
         var url = "PHP/Edit.php";
-        var param = "id1=" + encodeURIComponent(id) + "&table=" + encodeURIComponent(table) + "&newValue=" + encodeURIComponent(target.value);
+        var param = "id1=" + encodeURIComponent(id)
+        param = param + "&table=" + encodeURIComponent(table)
+        param = param +"&newValue=" + encodeURIComponent(target.value);
         var xhr = new XMLHttpRequest();
         xhr.onreadystatechange = function() {
             if (xhr.readyState === 4 && xhr.status === 200) {
@@ -460,7 +487,6 @@ function InsertSelectHelper(table, id){
         xhr.send(param);
     }
 }
-
 
 function InsertSelect(td, array, text, value, onChanged,selected, moreOption=[], id=null, table = null){
     var select = document.createElement("SELECT");

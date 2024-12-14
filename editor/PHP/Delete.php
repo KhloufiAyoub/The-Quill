@@ -44,6 +44,20 @@ if (isset($_POST["id1"]) && isset($_POST["table"])){
             $stm->execute(array($id1));
             echo "objet";
             break;
+        case "Action":
+            if (isset($_POST["id2"]) && isset($_POST["id3"])){
+                $id2 = $_POST["id2"];
+                $id3 = $_POST["id3"];
 
+                $stm=$dbh->prepare("SELECT aid FROM action WHERE tbl=? AND wid1=? AND wid2=?");
+                $stm->execute(array($id1,$id2,$id3));
+                $res = $stm->fetch();
+                $aid = $res["aid"];
+
+                $stm = $dbh->prepare("DELETE FROM action WHERE aid=?");
+                $stm->execute(array($aid));
+            }
+            echo "action";
+            break;
     }
 }
