@@ -151,7 +151,8 @@ function AddVocab(){
     var vocabNum = $("VocabNum");
     var vocabValue = $("VocabValue");
     var url="PHP/AddVocab.php";
-    var param="wid="+encodeURIComponent(vocabNum.value)+ "&word=" + encodeURIComponent(vocabValue.value);
+    var param="wid="+encodeURIComponent(vocabNum.value)
+    param = param + "&word=" + encodeURIComponent(vocabValue.value);
     Add(url,param,vocabNum);
 }
 
@@ -160,7 +161,9 @@ function AddMove(){
     var wid = $("wid");
     var newroom = $("newroom");
     var url="PHP/AddMove.php";
-    var param="rid="+encodeURIComponent(rid.value)+ "&wid=" + encodeURIComponent(wid.value) + "&newroom=" + encodeURIComponent(newroom.value);
+    var param="rid="+encodeURIComponent(rid.value)
+    param = param + "&wid=" + encodeURIComponent(wid.value)
+    param = param + "&newroom=" + encodeURIComponent(newroom.value);
     Add(url,param,rid);
 }
 
