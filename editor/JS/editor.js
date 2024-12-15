@@ -1,5 +1,62 @@
 init();
 
+const conditions = [
+    { Cond: "TRUE", par1: null, par2: null },
+    { Cond: "AT", par1: "room", par2: null },
+    { Cond: "NOTAT", par1: "room", par2: null },
+    { Cond: "ATGT", par1: "room", par2: null },
+    { Cond: "ATLT", par1: "room", par2: null },
+    { Cond: "PRESENT", par1: "objet", par2: null },
+    { Cond: "ABSENT", par1: "objet", par2: null },
+    { Cond: "WORN", par1: "objet", par2: null },
+    { Cond: "NOTWORN", par1: "objet", par2: null },
+    { Cond: "CARRIED", par1: "objet", par2: null },
+    { Cond: "NOTCARR", par1: "objet", par2: null },
+    { Cond: "CHANCE", par1: "1-100", par2: null },
+    { Cond: "ZERO", par1: "flag", par2: null },
+    { Cond: "NOTZERO", par1: "flag", par2: null },
+    { Cond: "EQ", par1: "flag", par2: "flag" },
+    { Cond: "GT", par1: "flag", par2: "valeur" },
+    { Cond: "LT", par1: "flag", par2: "valeur" }
+];
+
+const instructions = [
+    { Instr: "NOP", par1: null, par2: null },
+    { Instr: "INVENTORY", par1: null, par2: null },
+    { Instr: "DESCRIBE", par1: null, par2: null },
+    { Instr: "QUIT", par1: null, par2: null },
+    { Instr: "END", par1: null, par2: null },
+    { Instr: "DONE", par1: null, par2: null },
+    { Instr: "OK", par1: null, par2: null },
+    { Instr: "ANYKEY", par1: null, par2: null },
+    { Instr: "SAVE", par1: null, par2: null },
+    { Instr: "LOAD", par1: null, par2: null },
+    { Instr: "TURNS", par1: null, par2: null },
+    { Instr: "SCORE", par1: null, par2: null },
+    { Instr: "CLS", par1: null, par2: null },
+    { Instr: "DROPALL", par1: null, par2: null },
+    { Instr: "AUTOGET", par1: null, par2: null },
+    { Instr: "AUTODROP", par1: null, par2: null },
+    { Instr: "AUTOWEAR", par1: null, par2: null },
+    { Instr: "AUTOREM", par1: null, par2: null },
+    { Instr: "GOTO", par1: "room", par2: null },
+    { Instr: "REMOVE", par1: "objet", par2: null },
+    { Instr: "GET", par1: "objet", par2: null },
+    { Instr: "WEAR", par1: "objet", par2: null },
+    { Instr: "DROP", par1: "objet", par2: null },
+    { Instr: "CREATE", par1: "objet", par2: null },
+    { Instr: "DESTROY", par1: "objet", par2: null },
+    { Instr: "PLACE", par1: "objet", par2: "room" },
+    { Instr: "SWAP", par1: "objet", par2: "objet" },
+    { Instr: "PAUSE", par1: "duree", par2: null },
+    { Instr: "MESSAGE", par1: "msg", par2: null },
+    { Instr: "SET", par1: "flag", par2: null },
+    { Instr: "CLEAR", par1: "flag", par2: null },
+    { Instr: "PLUS", par1: "flag", par2: "valeur" },
+    { Instr: "MINUS", par1: "flag", par2: "valeur" },
+    { Instr: "LET", par1: "flag", par2: "valeur" }
+];
+
 function init(){
     $("RoomButton").onclick = ShowRoom;
     $("MsgButton").onclick = ShowMessage;
@@ -31,8 +88,8 @@ function init(){
     $("GetMove").onclick = GetMove;
     $("GetObject").onclick = GetObject;
     $("GetVocab").onclick = GetVocab;
-    $("GetAction").onclick = GetAction;
-
+    var getAction = $("GetAction");
+    getAction.addEventListener("click", GetAction);
     GetMaxValue();
 }
 //TODO : Tableau d'instructions et de conditions
@@ -73,13 +130,146 @@ function ShowVocab(){
     show("AddVocab");
 }
 
-function ShowAction(){
+function ShowAction(result){
     hide("AddRoom");
     hide("AddMsg");
     hide("AddObj");
     hide("AddMove");
     hide("AddVocab");
     show("AddAction");
+
+    var word1 = $("word1")
+    word1.innerHTML = "";
+    var word2 = $("word2")
+    word2.innerHTML = "";
+
+    var option = document.createElement("OPTION");
+    for(var i = 0; i <  result["vocab"].length; i++){
+        option = document.createElement("OPTION");
+        option.text = result["vocab"][i]["word"];
+        option.value = result["vocab"][i]["wid"];
+        word1.add(option);
+
+        var option2 = document.createElement("OPTION");
+        option2.text = result["vocab"][i]["word"];
+        option2.value = result["vocab"][i]["wid"];
+        word2.add(option2);
+    }
+
+    var condition = $("condition")
+    condition.innerHTML = "";
+    option = document.createElement("OPTION");
+    for(i = 0; i < conditions.length; i++){
+        option = document.createElement("OPTION");
+        option.text = conditions[i]["Cond"];
+        condition.add(option);
+    }
+    var instruction = $("instruction")
+    instruction.innerHTML = "";
+    for(i = 0; i < instructions.length; i++){
+        option = document.createElement("OPTION");
+        option.text = instructions[i]["Instr"];
+        instruction.add(option);
+    }
+    condition.onchange = ConditionHelper(result)
+    instruction.onchange = InstructionHelper(result)
+
+}
+
+function InstructionHelper(result){
+    return function(ev){
+        var InstDiv = $("InstDiv");
+        InstDiv.innerHTML = "";
+        var target= ev.target;
+        var instruction = target.value;
+        var par1, par2;
+        for (var i = 0; i < instructions.length; i++){
+            if (instructions[i]["Instr"] === instruction){
+                par1 = instructions[i]["par1"];
+                par2 = instructions[i]["par2"];
+            }
+        }
+        SwitchFunction(par1, result, InstDiv, 1);
+        SwitchFunction(par2, result, InstDiv, 2);
+    }
+}
+
+function ConditionHelper(result){
+    return function(ev){
+        var CondDiv = $("CondDiv");
+        CondDiv.innerHTML = "";
+        var target= ev.target;
+        var condition = target.value;
+        var par1, par2;
+        for (var i = 0; i < conditions.length; i++){
+            if (conditions[i]["Cond"] === condition){
+                par1 = conditions[i]["par1"];
+                par2 = conditions[i]["par2"];
+            }
+        }
+        SwitchFunction(par1, result,CondDiv,1);
+        SwitchFunction(par2, result, CondDiv,2);
+    }
+}
+
+function SwitchFunction(par, result, div,num){
+    var label = document.createElement("LABEL");
+    var id = div.id === "CondDiv" ? "CondParam"+num : "InstParam"+num
+    var input = document.createElement("INPUT");
+    switch(par){
+        case "room":
+            label.textContent = "Piece : ";
+            label.htmlFor = id;
+            div.appendChild(label);
+            InsertSelect(div, result["room"], "roomdesc", "rid", false, "", [], id);
+            break;
+        case "objet":
+            label.textContent = "Objet : ";
+            label.htmlFor = id;
+            div.appendChild(label);
+            InsertSelect(div, result["obj"], "objdesc", "objid", false, "", [], id);
+            break;
+        case "flag":
+            label.textContent = "Flag : ";
+            id = div.id === "CondDiv" ? "CondFlag" + num: "InstFlag"+ num;
+            label.htmlFor = id;
+            div.appendChild(label);
+            input = document.createElement("INPUT");
+            input.type = "number";
+            input.id = id;
+            div.appendChild(input);
+            break;
+        case "1-100":
+            $(param).hidden = false;
+            $(label).hidden = false;
+            GetChanceSelect("par1");
+            break;
+        case null:
+            console.log(param, label)
+            $(param).hidden = true;
+            $(label).hidden = true;
+            break;
+        case "valeur":
+            label.textContent = "Valeur : ";
+            id = div.id === "CondDiv" ? "CondVal" + num: "InstVal" + num;
+            label.htmlFor = id;
+            div.appendChild(label);
+            input = document.createElement("INPUT");
+            input.type = "number";
+            input.id = id;
+            div.appendChild(input);
+            break;
+        case "msg":
+            label.textContent = "Message : ";
+            label.htmlFor = id;
+            div.appendChild(label);
+            InsertSelect(div, result["msg"], "message", "mid", false, "", [], id);
+            break;
+        case "duree" :
+            $(param).hidden = false;
+            $(label).hidden = false;
+            break;
+    }
 }
 
 function ShowMove(){
@@ -266,12 +456,25 @@ function GetVocab(){
 
 function GetAction(){
     var url="PHP/GetAction.php";
-    Get(url,["tbl","wid1", "wid2", "pgm"], "Action", null, true,true)
+    var xhr= new XMLHttpRequest();
+    xhr.onreadystatechange = function(){
+        if (xhr.readyState === 4 && xhr.status === 200){
+            ProcessRequest(xhr.responseText, ["tbl","wid1", "wid2", "pgm"],"Action", null, true, true, false, "action");
+            var actionButton = $("ActionButton");
+            show("ActionButton");
+            actionButton.addEventListener("click", function(){ShowAction(JSON.parse(xhr.responseText))});
+        }
+    }
+    xhr.open("POST",url,true);
+    xhr.send();
 }
 
 
-function ProcessRequest(str,elements,table, promptvalue, isDeletable, isEditable, UseInnerHTML){
+function ProcessRequest(str,elements,table, promptvalue, isDeletable, isEditable, UseInnerHTML, table2=null){
     var result = JSON.parse(str);
+    if(table2 !== null){
+        result= result[table2];
+    }
     var el=document.getElementById("maDiv");
     var i,j,tbl,tr;
     el.innerHTML="";

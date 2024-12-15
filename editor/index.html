@@ -68,7 +68,37 @@
         <div id="action">
             <div id="AddAction">
                 <h2>Éditeur d'action</h2>
-                <div id="ActionSelect"></div>
+                <label for="tblNum">Table 0 (status) ou 1 (event) : </label>
+                <input type="number" id="tblNum" placeholder="tbl"  min="0" max="1"/><br>
+
+                <label for="word1">Mot 1 : </label>
+                <select id="word1"></select><br>
+                <label for="word2">Mot 2 : </label>
+                <select id="word2"></select><br>
+
+                <label for="condition">Condition : </label>
+                <select id="condition"></select><br>
+                <div id="CondDiv"></div>
+                <label id="labelCondFlag" for="CondFlag"></label>
+                <input type="number" id="CondFlag" placeholder="flag" hidden="hidden"/><br>
+
+                <label id="labelCondParam1" for="CondParam1"></label>
+                <select id="CondParam1" hidden="hidden"></select><br>
+                <label id="labelCondParam2" for="CondParam2"></label>
+                <select id="CondParam2" hidden="hidden"></select><br>
+
+                <label for="instruction">Instruction : </label>
+                <select id="instruction"></select><br>
+                <div id="InstDiv"></div>
+
+                <label id="labelInstFlag" for="InstFlag"></label>
+                <input type="number" id="InstFlag" placeholder="flag" hidden="hidden"/><br>
+
+                <label id="labelInstParam1" for="InstParam1"></label>
+                <select id="InstParam1" hidden="hidden"></select><br>
+                <label id="labelInstParam2" for="InstParam2"></label>
+                <select id="InstParam2" hidden="hidden"></select><br>
+
                 <input type="submit" id="ActionSubmit" value="Ajouter">
                 <input type="button" id="ActionCancel" value="Annuler">
             </div>

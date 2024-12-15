@@ -57,8 +57,8 @@ function decodeCommand(): void{
         foreach ($commands as $command){
             $command=strtoupper($command);
             $command=substr($command, 0, $wordsize);
-            $stm=$dbh->prepare("SELECT wid FROM vocab WHERE word=?");
-            $stm->execute(array($command));
+            $stm=$dbh->prepare("SELECT wid FROM vocab WHERE SUBSTRING(word, 1, ?) = ?");
+            $stm->execute(array($wordsize, $command));
             if ($row=$stm->fetch()) {
                 $words[]=$row["wid"];
                 $count++;
