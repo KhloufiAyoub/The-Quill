@@ -15,7 +15,7 @@ const conditions = [
     { Cond: "CHANCE", par1: "1-100", par2: null },
     { Cond: "ZERO", par1: "flag", par2: null },
     { Cond: "NOTZERO", par1: "flag", par2: null },
-    { Cond: "EQ", par1: "flag", par2: "flag" },
+    { Cond: "EQ", par1: "flag", par2: "valeur" },
     { Cond: "GT", par1: "flag", par2: "valeur" },
     { Cond: "LT", par1: "flag", par2: "valeur" }
 ];
@@ -88,8 +88,7 @@ function init(){
     $("GetMove").onclick = GetMove;
     $("GetObject").onclick = GetObject;
     $("GetVocab").onclick = GetVocab;
-    var getAction = $("GetAction");
-    getAction.addEventListener("click", GetAction);
+    $("GetAction").onclick = GetAction;
     GetMaxValue();
 }
 //TODO : Tableau d'instructions et de conditions
@@ -130,7 +129,8 @@ function ShowVocab(){
     show("AddVocab");
 }
 
-function ShowAction(result){
+function ShowAction(str){
+    var result = JSON.parse(str);
     hide("AddRoom");
     hide("AddMsg");
     hide("AddObj");
@@ -144,13 +144,20 @@ function ShowAction(result){
     word2.innerHTML = "";
 
     var option = document.createElement("OPTION");
+    var option2 = document.createElement("OPTION");
+    option.text = "-----";
+    option.value = null;
+    word1.add(option);
+    option2.text = "-----";
+    option2.value = null;
+    word2.add(option2);
     for(var i = 0; i <  result["vocab"].length; i++){
         option = document.createElement("OPTION");
         option.text = result["vocab"][i]["word"];
         option.value = result["vocab"][i]["wid"];
         word1.add(option);
 
-        var option2 = document.createElement("OPTION");
+        option2 = document.createElement("OPTION");
         option2.text = result["vocab"][i]["word"];
         option2.value = result["vocab"][i]["wid"];
         word2.add(option2);
@@ -173,7 +180,6 @@ function ShowAction(result){
     }
     condition.onchange = ConditionHelper(result)
     instruction.onchange = InstructionHelper(result)
-
 }
 
 function InstructionHelper(result){
@@ -190,6 +196,8 @@ function InstructionHelper(result){
             }
         }
         SwitchFunction(par1, result, InstDiv, 1);
+        var br = document.createElement("BR");
+        InstDiv.appendChild(br);
         SwitchFunction(par2, result, InstDiv, 2);
     }
 }
@@ -208,6 +216,8 @@ function ConditionHelper(result){
             }
         }
         SwitchFunction(par1, result,CondDiv,1);
+        var br = document.createElement("BR");
+        CondDiv.appendChild(br);
         SwitchFunction(par2, result, CondDiv,2);
     }
 }
@@ -237,17 +247,22 @@ function SwitchFunction(par, result, div,num){
             input = document.createElement("INPUT");
             input.type = "number";
             input.id = id;
+            input.min = 0;
             div.appendChild(input);
             break;
         case "1-100":
-            $(param).hidden = false;
-            $(label).hidden = false;
-            GetChanceSelect("par1");
+            label.textContent = "Valeur de 1 à 100: ";
+            id = div.id === "CondDiv" ? "Cond1-100_" + num: "Inst1-100_" + num;
+            label.htmlFor = id;
+            div.appendChild(label);
+            input = document.createElement("INPUT");
+            input.type = "number";
+            input.id = id;
+            input.min = 1;
+            input.max = 100;
+            div.appendChild(input);
             break;
         case null:
-            console.log(param, label)
-            $(param).hidden = true;
-            $(label).hidden = true;
             break;
         case "valeur":
             label.textContent = "Valeur : ";
@@ -266,8 +281,15 @@ function SwitchFunction(par, result, div,num){
             InsertSelect(div, result["msg"], "message", "mid", false, "", [], id);
             break;
         case "duree" :
-            $(param).hidden = false;
-            $(label).hidden = false;
+            label.textContent = "Durée en millisecondes : ";
+            id = div.id === "CondDiv" ? "CondDuree" + num: "InstDuree" + num;
+            label.htmlFor = id;
+            div.appendChild(label);
+            input = document.createElement("INPUT");
+            input.type = "number";
+            input.id = id;
+            input.min = 0;
+            div.appendChild(input);
             break;
     }
 }
@@ -291,25 +313,27 @@ function ShowMove(){
         label.textContent = "Déplacement : ";
         label.htmlFor = "rid";
         maDiv.appendChild(label);
-        InsertSelect(maDiv, arrays[0], "roomdesc", "rid", false, [], "rid");
+        InsertSelect(maDiv, arrays[0], "roomdesc", "rid", false,"", [], "rid");
         maDiv.appendChild(document.createElement("BR"))
         label = document.createElement("LABEL");
         label.textContent = "Mot : ";
         label.htmlFor = "wid";
         maDiv.appendChild(label);
-        InsertSelect(maDiv, arrays[1],"word", "wid",  false, [],"wid");
+        InsertSelect(maDiv, arrays[1],"word", "wid",  false, "",[],"wid");
         maDiv.appendChild(document.createElement("BR"))
         label = document.createElement("LABEL");
         label.textContent = "Nouvelle pièce : ";
         label.htmlFor = "newroom";
         maDiv.appendChild(label);
-        InsertSelect(maDiv, arrays[2],"roomdesc", "rid", false, [],"newroom");
+        InsertSelect(maDiv, arrays[2],"roomdesc", "rid", false, "",[],"newroom");
         maDiv.appendChild(document.createElement("BR"))
     });
 }
 
-function Add(url,param, element){
-    element.value="";
+function Add(url,param, elements){
+    for (var i = 0; i < elements.length; i++){
+        elements[i].value = "";
+    }
     var xhr= new XMLHttpRequest();
     xhr.open("POST",url,true);
     xhr.setRequestHeader("Content-Type","application/x-www-form-urlencoded");
@@ -320,21 +344,21 @@ function AddRoom(){
     var roomName = $("RoomValue");
     var url="PHP/AddRoom.php";
     var param="room="+encodeURIComponent(roomName.value);
-    Add(url,param,roomName);
+    Add(url,param,[roomName]);
 }
 
 function AddMessage(){
     var msgName = $("MsgValue");
     var url="PHP/AddMsg.php";
     var param="msg="+encodeURIComponent(msgName.value);
-    Add(url,param,msgName);
+    Add(url,param,[msgName]);
 }
 
 function AddObject(){
     var objName = $("ObjValue");
     var url="PHP/AddObj.php";
     var param="obj="+encodeURIComponent(objName.value);
-    Add(url,param,objName);
+    Add(url,param,[objName]);
 }
 
 function AddVocab(){
@@ -343,7 +367,7 @@ function AddVocab(){
     var url="PHP/AddVocab.php";
     var param="wid="+encodeURIComponent(vocabNum.value)
     param = param + "&word=" + encodeURIComponent(vocabValue.value);
-    Add(url,param,vocabNum);
+    Add(url,param,[vocabNum,vocabValue]);
 }
 
 function AddMove(){
@@ -354,7 +378,7 @@ function AddMove(){
     var param="rid="+encodeURIComponent(rid.value)
     param = param + "&wid=" + encodeURIComponent(wid.value)
     param = param + "&newroom=" + encodeURIComponent(newroom.value);
-    Add(url,param,rid);
+    Add(url,param,[rid,wid,newroom]);
 }
 
 function Edit(url,param){
@@ -460,9 +484,8 @@ function GetAction(){
     xhr.onreadystatechange = function(){
         if (xhr.readyState === 4 && xhr.status === 200){
             ProcessRequest(xhr.responseText, ["tbl","wid1", "wid2", "pgm"],"Action", null, true, true, false, "action");
-            var actionButton = $("ActionButton");
             show("ActionButton");
-            actionButton.addEventListener("click", function(){ShowAction(JSON.parse(xhr.responseText))});
+            $("ActionButton").onclick = function(){ShowAction(xhr.responseText)};
         }
     }
     xhr.open("POST",url,true);
@@ -499,7 +522,9 @@ function ProcessRequest(str,elements,table, promptvalue, isDeletable, isEditable
                 InsertDeleteImg(tr, id, table, result[i][elements[1]])
             }else if(table === "Action"){
                 InsertDeleteImg(tr, id, table, result[i][elements[1]], result[i][elements[2]])
-            }else {
+            }else if(table === "Vocab"){
+                InsertDeleteImg(tr, id, table,result[i][elements[1]]);
+            }else{
                 InsertDeleteImg(tr, id, table);
             }
         }
@@ -628,7 +653,6 @@ function InsertDeleteImg(tr, id1, table, id2=null, id3=null){
 function InsertDeleteHelper(id1, id2, id3, table){
     return function(){
         var url="PHP/Delete.php";
-        console.log(id1,id2,id3,table);
         var param="id1="+encodeURIComponent(id1)
         param = param + "&id2=" + encodeURIComponent(id2)
         param = param + "&id3=" + encodeURIComponent(id3)

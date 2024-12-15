@@ -35,8 +35,11 @@ if (isset($_POST["id1"]) && isset($_POST["table"])){
             echo "deplacement";
             break;
         case "Vocab":
-            $stm=$dbh->prepare("DELETE FROM vocab WHERE wid=?");
-            $stm->execute(array($id1));
+            if (isset($_POST["id2"])) {
+                $id2 = $_POST["id2"];
+                $stm = $dbh->prepare("DELETE FROM vocab WHERE wid=? AND word=?");
+                $stm->execute(array($id1,$id2));
+            }
             echo "vocab";
             break;
         case "Objet":
