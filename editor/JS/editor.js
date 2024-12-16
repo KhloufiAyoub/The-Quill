@@ -236,10 +236,10 @@ function InstructionHelper(result){
                 par2 = instructions[i]["par2"];
             }
         }
-        SwitchFunction(par1, result, InstDiv, 1);
+        SetParamInput(par1, result, InstDiv, 1);
         var br = document.createElement("BR");
         InstDiv.appendChild(br);
-        SwitchFunction(par2, result, InstDiv, 2);
+        SetParamInput(par2, result, InstDiv, 2);
     }
 }
 
@@ -256,14 +256,14 @@ function ConditionHelper(result){
                 par2 = conditions[i]["par2"];
             }
         }
-        SwitchFunction(par1, result,CondDiv,1);
+        SetParamInput(par1, result,CondDiv,1);
         var br = document.createElement("BR");
         CondDiv.appendChild(br);
-        SwitchFunction(par2, result, CondDiv,2);
+        SetParamInput(par2, result, CondDiv,2);
     }
 }
 
-function SwitchFunction(par, result, div,num){
+function SetParamInput(par, result, div,num){
     var label = document.createElement("LABEL");
     var id = div.id === "CondDiv" ? "CondParam"+num : "InstParam"+num
     var input = document.createElement("INPUT");
