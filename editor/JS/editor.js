@@ -169,6 +169,7 @@ function ShowAction(str){
     for(i = 0; i < conditions.length; i++){
         option = document.createElement("OPTION");
         option.text = conditions[i]["Cond"];
+        option.value = conditions[i]["Cond"];
         condition.add(option);
     }
     var instruction = $("instruction")
@@ -176,6 +177,7 @@ function ShowAction(str){
     for(i = 0; i < instructions.length; i++){
         option = document.createElement("OPTION");
         option.text = instructions[i]["Instr"];
+        option.value = instructions[i]["Instr"];
         instruction.add(option);
     }
     condition.onchange = ConditionHelper(result)
