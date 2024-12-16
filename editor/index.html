@@ -78,11 +78,19 @@
 
                 <label for="condition">Condition : </label>
                 <select id="condition"></select><br>
-                <div id="CondDiv"></div>
+                <div id="CondDiv">
+                    <input type="hidden" id="CondParam1" value="null">
+                    <input type="hidden" id="CondParam2" value="null">
+                </div>
 
                 <label for="instruction">Instruction : </label>
                 <select id="instruction"></select><br>
-                <div id="InstDiv"></div>
+                <div id="InstDiv">
+                    <input type="hidden" id="InstParam1" value="null">
+                    <input type="hidden" id="InstParam2" value="null">
+                </div>
+
+                <input type="hidden" value="0" id="formType">
 
                 <input type="submit" id="ActionSubmit" value="Ajouter">
                 <input type="button" id="ActionCancel" value="Annuler">

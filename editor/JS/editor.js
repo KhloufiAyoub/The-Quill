@@ -58,12 +58,11 @@ const instructions = [
 ];
 
 function init(){
-    $("RoomButton").onclick = ShowRoom;
-    $("MsgButton").onclick = ShowMessage;
-    $("ObjButton").onclick = ShowObject;
-    $("MoveButton").onclick = ShowMove;
-    $("VocabButton").onclick = ShowVocab;
-    $("ActionButton").onclick = ShowAction;
+    $("RoomButton").onclick = ShowRoomForm;
+    $("MsgButton").onclick = ShowMessageForm;
+    $("ObjButton").onclick = ShowObjectForm;
+    $("MoveButton").onclick = ShowMoveForm;
+    $("VocabButton").onclick = ShowVocabForm;
 
     $("RoomSubmit").onclick = AddRoom;
     $("RoomCancel").onclick = function () {hide("AddRoom");};
@@ -75,7 +74,7 @@ function init(){
     $("VocabCancel").onclick = function () {hide("AddVocab");};
     $("MoveSubmit").onclick = AddMove;
     $("MoveCancel").onclick = function () {hide("AddMove");};
-    $("ActionSubmit").onclick = AddAction; //TODO : A faire
+    $("ActionSubmit").onclick = AddAction;
     $("ActionCancel").onclick = function () {hide("AddAction");};
 
     $("submitWord").onclick = EditWord; // reverif
@@ -91,45 +90,85 @@ function init(){
     $("GetAction").onclick = GetAction;
     GetMaxValue();
 }
-//TODO : Tableau d'instructions et de conditions
 
-function ShowRoom(){
+function ShowRoomForm(){
     hide("AddMsg");
     hide("AddObj");
     hide("AddVocab");
     hide("AddMove");
     hide("AddAction");
+    hide("ActionButton");
     show("AddRoom");
 }
 
-function ShowMessage(){
+function ShowMessageForm(){
     hide("AddRoom");
     hide("AddObj");
     hide("AddVocab");
     hide("AddMove");
     hide("AddAction");
+    hide("ActionButton");
     show("AddMsg");
 }
 
-function ShowObject(){
+function ShowObjectForm(){
     hide("AddRoom");
     hide("AddMsg");
     hide("AddVocab");
     hide("AddMove");
     hide("AddAction");
+    hide("ActionButton");
     show("AddObj");
 }
 
-function ShowVocab(){
+function ShowVocabForm(){
     hide("AddRoom");
     hide("AddMsg");
     hide("AddObj");
     hide("AddMove");
     hide("AddAction");
+    hide("ActionButton");
     show("AddVocab");
 }
 
-function ShowAction(str){
+function ShowMoveForm(){
+    hide("AddRoom");
+    hide("AddMsg");
+    hide("AddObj");
+    hide("AddVocab");
+    hide("AddAction");
+    hide("ActionButton");
+    show("AddMove");
+
+    var maDiv = $("MoveSelect");
+    maDiv.innerHTML = "";
+    Promise.all([
+        GetValueArray("PHP/GetRoom.php"),
+        GetValueArray("PHP/GetVocab.php"),
+        GetValueArray("PHP/GetRoom.php")
+    ]).then(function(arrays) {
+        var label = document.createElement("LABEL");
+        label.textContent = "Déplacement : ";
+        label.htmlFor = "rid";
+        maDiv.appendChild(label);
+        InsertSelect(maDiv, arrays[0], "roomdesc", "rid", false,"", [], "rid");
+        maDiv.appendChild(document.createElement("BR"))
+        label = document.createElement("LABEL");
+        label.textContent = "Mot : ";
+        label.htmlFor = "wid";
+        maDiv.appendChild(label);
+        InsertSelect(maDiv, arrays[1],"word", "wid",  false, "",[],"wid");
+        maDiv.appendChild(document.createElement("BR"))
+        label = document.createElement("LABEL");
+        label.textContent = "Nouvelle pièce : ";
+        label.htmlFor = "newroom";
+        maDiv.appendChild(label);
+        InsertSelect(maDiv, arrays[2],"roomdesc", "rid", false, "",[],"newroom");
+        maDiv.appendChild(document.createElement("BR"))
+    });
+}
+
+function ShowActionForm(str){
     var result = JSON.parse(str);
     hide("AddRoom");
     hide("AddMsg");
@@ -243,7 +282,6 @@ function SwitchFunction(par, result, div,num){
             break;
         case "flag":
             label.textContent = "Flag : ";
-            id = div.id === "CondDiv" ? "CondFlag" + num: "InstFlag"+ num;
             label.htmlFor = id;
             div.appendChild(label);
             input = document.createElement("INPUT");
@@ -254,7 +292,6 @@ function SwitchFunction(par, result, div,num){
             break;
         case "1-100":
             label.textContent = "Valeur de 1 à 100: ";
-            id = div.id === "CondDiv" ? "Cond1-100_" + num: "Inst1-100_" + num;
             label.htmlFor = id;
             div.appendChild(label);
             input = document.createElement("INPUT");
@@ -264,11 +301,8 @@ function SwitchFunction(par, result, div,num){
             input.max = 100;
             div.appendChild(input);
             break;
-        case null:
-            break;
         case "valeur":
             label.textContent = "Valeur : ";
-            id = div.id === "CondDiv" ? "CondVal" + num: "InstVal" + num;
             label.htmlFor = id;
             div.appendChild(label);
             input = document.createElement("INPUT");
@@ -284,7 +318,6 @@ function SwitchFunction(par, result, div,num){
             break;
         case "duree" :
             label.textContent = "Durée en millisecondes : ";
-            id = div.id === "CondDiv" ? "CondDuree" + num: "InstDuree" + num;
             label.htmlFor = id;
             div.appendChild(label);
             input = document.createElement("INPUT");
@@ -293,43 +326,14 @@ function SwitchFunction(par, result, div,num){
             input.min = 0;
             div.appendChild(input);
             break;
+        case null:
+            input = document.createElement("INPUT");
+            input.type = "hidden";
+            input.id = id;
+            input.value = null;
+            div.appendChild(input);
+            break
     }
-}
-
-function ShowMove(){
-    hide("AddRoom");
-    hide("AddMsg");
-    hide("AddObj");
-    hide("AddVocab");
-    hide("AddAction");
-    show("AddMove");
-
-    var maDiv = $("MoveSelect");
-    maDiv.innerHTML = "";
-    Promise.all([
-        GetValueArray("PHP/GetRoom.php"),
-        GetValueArray("PHP/GetVocab.php"),
-        GetValueArray("PHP/GetRoom.php")
-    ]).then(function(arrays) {
-        var label = document.createElement("LABEL");
-        label.textContent = "Déplacement : ";
-        label.htmlFor = "rid";
-        maDiv.appendChild(label);
-        InsertSelect(maDiv, arrays[0], "roomdesc", "rid", false,"", [], "rid");
-        maDiv.appendChild(document.createElement("BR"))
-        label = document.createElement("LABEL");
-        label.textContent = "Mot : ";
-        label.htmlFor = "wid";
-        maDiv.appendChild(label);
-        InsertSelect(maDiv, arrays[1],"word", "wid",  false, "",[],"wid");
-        maDiv.appendChild(document.createElement("BR"))
-        label = document.createElement("LABEL");
-        label.textContent = "Nouvelle pièce : ";
-        label.htmlFor = "newroom";
-        maDiv.appendChild(label);
-        InsertSelect(maDiv, arrays[2],"roomdesc", "rid", false, "",[],"newroom");
-        maDiv.appendChild(document.createElement("BR"))
-    });
 }
 
 function Add(url,param, elements){
@@ -338,6 +342,11 @@ function Add(url,param, elements){
     }
     var xhr= new XMLHttpRequest();
     xhr.open("POST",url,true);
+    xhr.onreadystatechange = function(){
+        if (xhr.readyState === 4 && xhr.status === 200){
+            Refresh(xhr.response);
+        }
+    }
     xhr.setRequestHeader("Content-Type","application/x-www-form-urlencoded");
     xhr.send(param);
 }
@@ -381,6 +390,30 @@ function AddMove(){
     param = param + "&wid=" + encodeURIComponent(wid.value)
     param = param + "&newroom=" + encodeURIComponent(newroom.value);
     Add(url,param,[rid,wid,newroom]);
+}
+
+function AddAction(){
+    var tblNum = $("tblNum").value;
+    var wid1 = $("word1").value;
+    var wid2 = $("word2").value;
+    var condition = $("condition").value;
+    var condParam1 = $("CondParam1").value;
+    var condParam2 = $("CondParam2").value;
+    var instruction = $("instruction").value;
+    var instParam1 = $("InstParam1").value;
+    var instParam2 = $("InstParam2").value;
+    var url="PHP/AddAction.php";
+    var aid = "1";
+    var param = "aid=" + encodeURIComponent(aid);
+    param = param + "&tbl="+encodeURIComponent(tblNum)
+    param = param + "&wid1=" + encodeURIComponent(wid1)
+    param = param + "&wid2=" + encodeURIComponent(wid2)
+
+    var pgm = {"condition": {"nom" : condition, "param1": condParam1, "param2":condParam2},
+                                                                            "instruction": {"nom" : instruction, "param1" : instParam1, "param2" : instParam2}}
+    param = param + "&pgm=" + encodeURIComponent(JSON.stringify(pgm));
+    Add(url,param,[tblNum,wid1,wid2,condition,condParam1,condParam2,instruction,instParam1,instParam2]);
+    hide("AddAction");
 }
 
 function Edit(url,param){
@@ -445,6 +478,8 @@ function SplitValue(response){
 }
 
 function Get(url, elements,table, promptvalue= null, isDeletable=true, isEditable=true, UseInnerHTML=false){
+    hide("ActionButton");
+    hide("AddAction");
     var xhr= new XMLHttpRequest();
     xhr.onreadystatechange = function(){
         if (xhr.readyState === 4 && xhr.status === 200){
@@ -487,18 +522,20 @@ function GetAction(){
         if (xhr.readyState === 4 && xhr.status === 200){
             ProcessRequest(xhr.responseText, ["tbl","wid1", "wid2", "pgm"],"Action", null, true, true, false, "action");
             show("ActionButton");
-            $("ActionButton").onclick = function(){ShowAction(xhr.responseText)};
+            $("ActionButton").onclick = function(){ShowActionForm(xhr.responseText)};
         }
     }
     xhr.open("POST",url,true);
     xhr.send();
 }
 
-
 function ProcessRequest(str,elements,table, promptvalue, isDeletable, isEditable, UseInnerHTML, table2=null){
     var result = JSON.parse(str);
     if(table2 !== null){
         result= result[table2];
+        result.forEach(function(item){
+            item["pgm"] = JSON.parse(item["pgm"]);
+        })
     }
     var el=document.getElementById("maDiv");
     var i,j,tbl,tr;
@@ -515,7 +552,11 @@ function ProcessRequest(str,elements,table, promptvalue, isDeletable, isEditable
         tr=document.createElement("TR");
         //Insertion des colonnes
         for (j=0;j<elements.length;j++) {
-            InsertColumn(tr, result[i][elements[j]],UseInnerHTML);
+            if (table === "Action" && elements[j] === "pgm"){
+                InsertColumn(tr, result[i]["pgm"],true);
+            }else{
+            InsertColumn(tr, result[i][elements[j]]);
+            }
         }
         var id = result[i][elements[0]];
         //Insertion des images de suppression
@@ -593,7 +634,6 @@ function ProcessRequestObj(str, elements, elements2, table, promptvalue) {
     el.appendChild(tbl);
 } // a revoir
 
-
 function GetValueArray(url, id=null){
     return new Promise(function(resolve, reject) {
         var xhr = new XMLHttpRequest();
@@ -613,7 +653,6 @@ function GetValueArray(url, id=null){
         xhr.send(param);
     });
 }
-
 
 function InsertEditImg(tr,id, table, promptvalue){
     var img = document.createElement("IMG");
@@ -696,14 +735,22 @@ function Refresh (str){
 
 //TODO : Pas de InnerHTML
 
-function InsertColumn(tr, item, UseInnerHTML){
+function InsertColumn(tr, item, isTab=false){
     var td = document.createElement("TD");
-    item = String(item).trunc(80, " ", true);
-    if (UseInnerHTML){
-        td.innerHTML=item;
+    if (isTab){
+        var str = "";
+        for(var i in item){
+            str += i + " : " + item[i]["nom"] + "\n";
+            str += "\tparam1"+ " : " + item[i]["param1"] + "\n";
+            str += "\tparam2"+ " : " + item[i]["param2"] + "\n";
+        }
+        var tn1 = document.createTextNode(str);
+        td.appendChild(tn1);
+        td.style.whiteSpace = "pre"
     }else {
-        var tn = document.createTextNode(item);
-        td.appendChild(tn);
+        item = String(item).trunc(80, " ", true);
+        var tn2 = document.createTextNode(item);
+        td.appendChild(tn2);
     }
     tr.appendChild(td);
 }
@@ -727,7 +774,7 @@ function InsertSelectHelper(table, id){
     }
 }
 
-function InsertSelect(td, array, text, value, onChanged,selected, moreOption=[], id=null, table = null){
+function InsertSelect(el, array, text, value, onChanged,selected, moreOption=[], id=null, table = null){
     var select = document.createElement("SELECT");
     if (onChanged){
         select.onchange = InsertSelectHelper(table,id);
@@ -754,15 +801,5 @@ function InsertSelect(td, array, text, value, onChanged,selected, moreOption=[],
         }
         select.appendChild(option);
     }
-    td.appendChild(select);
+    el.appendChild(select);
 }
-
-
-
-
-
-
-
-
-
-

@@ -16,3 +16,5 @@ if (isset($_POST["wid"]) && isset($_POST["word"]))
         }
     }
 }
+
+echo "vocab";
