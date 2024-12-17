@@ -168,8 +168,7 @@ function ShowMoveForm(){
     });
 }
 
-function ShowActionForm(str){
-    var result = JSON.parse(str);
+function ShowActionForm(str, data=null){
     hide("AddRoom");
     hide("AddMsg");
     hide("AddObj");
@@ -177,28 +176,78 @@ function ShowActionForm(str){
     hide("AddVocab");
     show("AddAction");
 
+    var result
+    var i
+    var actionSubmit = $("ActionSubmit");
+    var actionTitle = $("ActionTitle");
+    actionSubmit.value = "Ajouter";
+    actionTitle.textContent = "Ajouter une action";
+
+    if(data==null){
+        result = JSON.parse(str);
+    }else{
+        result= str
+        actionSubmit.value = "Modifier";
+        actionTitle.textContent = "Modifier l'action";
+    }
+
+    var option = document.createElement("OPTION");
+    var option2 = document.createElement("OPTION");
+
+    var tblNum = $("tblNum")
+    tblNum.innerHTML = "";
+    option.value = 0
+    option.text = 0
+    if(data!=null){
+        if(data["tbl"] === 0){
+            option.selected = true;
+        }
+    }
+    tblNum.add(option);
+    option2.value = 1
+    option2.text = 1
+    if(data!=null) {
+        if (data["tbl"] === 1) {
+            option2.selected = true;
+        }
+    }
+    tblNum.add(option2);
+
     var word1 = $("word1")
     word1.innerHTML = "";
     var word2 = $("word2")
     word2.innerHTML = "";
 
-    var option = document.createElement("OPTION");
-    var option2 = document.createElement("OPTION");
+    option = document.createElement("OPTION");
+    option2 = document.createElement("OPTION");
+
     option.text = "-----";
     option.value = null;
+    option.selected = true;
     word1.add(option);
     option2.text = "-----";
     option2.value = null;
+    option2.selected = true;
     word2.add(option2);
-    for(var i = 0; i <  result["vocab"].length; i++){
+    for(i = 0; i <  result["vocab"].length; i++){
         option = document.createElement("OPTION");
         option.text = result["vocab"][i]["word"];
         option.value = result["vocab"][i]["wid"];
+        if(data!=null){
+            if (result["vocab"][i]["wid"] === data["wid1"]){
+                option.selected = true;
+            }
+        }
         word1.add(option);
 
         option2 = document.createElement("OPTION");
         option2.text = result["vocab"][i]["word"];
         option2.value = result["vocab"][i]["wid"];
+        if(data!=null){
+            if (result["vocab"][i]["wid"] === data["wid2"]){
+                option2.selected = true;
+            }
+        }
         word2.add(option2);
     }
 
@@ -209,21 +258,33 @@ function ShowActionForm(str){
         option = document.createElement("OPTION");
         option.text = conditions[i]["Cond"];
         option.value = conditions[i]["Cond"];
+        if(data!=null){
+            if (conditions[i]["Cond"] === data["pgm"]["condition"]["nom"]){
+                option.selected = true;
+            }
+        }
         condition.add(option);
     }
     var instruction = $("instruction")
     instruction.innerHTML = "";
-    for(i = 0; i < instructions.length; i++){
+    for(i = 0; i < instructions.length; i++) {
         option = document.createElement("OPTION");
         option.text = instructions[i]["Instr"];
         option.value = instructions[i]["Instr"];
+        if (data != null) {
+            if (instructions[i]["Instr"] === data["pgm"]["instruction"]["nom"]) {
+                option.selected = true;
+            }
+        }
         instruction.add(option);
     }
-    condition.onchange = ConditionHelper(result)
-    instruction.onchange = InstructionHelper(result)
+    condition.onchange = ConditionHelper(result,data)
+    instruction.onchange = InstructionHelper(result,data)
+    instruction.dispatchEvent(new Event("change"));
+    condition.dispatchEvent(new Event("change"));
 }
 
-function InstructionHelper(result){
+function InstructionHelper(result, data=null){
     return function(ev){
         var InstDiv = $("InstDiv");
         InstDiv.innerHTML = "";
@@ -236,14 +297,14 @@ function InstructionHelper(result){
                 par2 = instructions[i]["par2"];
             }
         }
-        SetParamInput(par1, result, InstDiv, 1);
+        SetParamInput(par1, result, InstDiv, 1,data,"instruction");
         var br = document.createElement("BR");
         InstDiv.appendChild(br);
-        SetParamInput(par2, result, InstDiv, 2);
+        SetParamInput(par2, result, InstDiv, 2, data,"instruction");
     }
 }
 
-function ConditionHelper(result){
+function ConditionHelper(result,data=null){
     return function(ev){
         var CondDiv = $("CondDiv");
         CondDiv.innerHTML = "";
@@ -256,29 +317,33 @@ function ConditionHelper(result){
                 par2 = conditions[i]["par2"];
             }
         }
-        SetParamInput(par1, result,CondDiv,1);
+        SetParamInput(par1, result,CondDiv,1,data,"condition");
         var br = document.createElement("BR");
         CondDiv.appendChild(br);
-        SetParamInput(par2, result, CondDiv,2);
+        SetParamInput(par2, result, CondDiv,2,data,"condition");
     }
 }
 
-function SetParamInput(par, result, div,num){
+function SetParamInput(par, result, div,num, data,table){
     var label = document.createElement("LABEL");
     var id = div.id === "CondDiv" ? "CondParam"+num : "InstParam"+num
     var input = document.createElement("INPUT");
+    var selected = ""
+    if(data !== null){
+        selected = data["pgm"][table]["param"+num];
+    }
     switch(par){
         case "room":
             label.textContent = "Piece : ";
             label.htmlFor = id;
             div.appendChild(label);
-            InsertSelect(div, result["room"], "roomdesc", "rid", false, "", [], id);
+            InsertSelect(div, result["room"], "roomdesc", "rid", false, selected, [], id);
             break;
         case "objet":
             label.textContent = "Objet : ";
             label.htmlFor = id;
             div.appendChild(label);
-            InsertSelect(div, result["obj"], "objdesc", "objid", false, "", [], id);
+            InsertSelect(div, result["obj"], "objdesc", "objid", false, selected, [], id);
             break;
         case "flag":
             label.textContent = "Flag : ";
@@ -287,6 +352,7 @@ function SetParamInput(par, result, div,num){
             input = document.createElement("INPUT");
             input.type = "number";
             input.id = id;
+            input.value = selected;
             input.min = 0;
             div.appendChild(input);
             break;
@@ -297,6 +363,7 @@ function SetParamInput(par, result, div,num){
             input = document.createElement("INPUT");
             input.type = "number";
             input.id = id;
+            input.value = selected;
             input.min = 1;
             input.max = 100;
             div.appendChild(input);
@@ -308,13 +375,14 @@ function SetParamInput(par, result, div,num){
             input = document.createElement("INPUT");
             input.type = "number";
             input.id = id;
+            input.value = selected;
             div.appendChild(input);
             break;
         case "msg":
             label.textContent = "Message : ";
             label.htmlFor = id;
             div.appendChild(label);
-            InsertSelect(div, result["msg"], "message", "mid", false, "", [], id);
+            InsertSelect(div, result["msg"], "message", "mid", false, selected, [], id);
             break;
         case "duree" :
             label.textContent = "Durée en millisecondes : ";
@@ -323,6 +391,7 @@ function SetParamInput(par, result, div,num){
             input = document.createElement("INPUT");
             input.type = "number";
             input.id = id;
+            input.value = selected;
             input.min = 0;
             div.appendChild(input);
             break;
@@ -401,14 +470,13 @@ function AddAction(){
     var condParam2 = $("CondParam2").value;
     var instruction = $("instruction").value;
     var instParam1 = $("InstParam1").value;
+
     var instParam2 = $("InstParam2").value;
     var url="PHP/AddAction.php";
-    var aid = "1";
-    var param = "aid=" + encodeURIComponent(aid);
-    param = param + "&tbl="+encodeURIComponent(tblNum)
+    var param = "formType="+encodeURIComponent($("formType").value)
+    param = param + "tbl="+encodeURIComponent(tblNum)
     param = param + "&wid1=" + encodeURIComponent(wid1)
     param = param + "&wid2=" + encodeURIComponent(wid2)
-
     var pgm = {"condition": {"nom" : condition, "param1": condParam1, "param2":condParam2},
                                                                             "instruction": {"nom" : instruction, "param1" : instParam1, "param2" : instParam2}}
     param = param + "&pgm=" + encodeURIComponent(JSON.stringify(pgm));
@@ -531,7 +599,9 @@ function GetAction(){
 
 function ProcessRequest(str,elements,table, promptvalue, isDeletable, isEditable, UseInnerHTML, table2=null){
     var result = JSON.parse(str);
+
     if(table2 !== null){
+        var tab = result;
         result= result[table2];
         result.forEach(function(item){
             item["pgm"] = JSON.parse(item["pgm"]);
@@ -573,7 +643,11 @@ function ProcessRequest(str,elements,table, promptvalue, isDeletable, isEditable
         }
         //Insertion des images d'édition
         if (isEditable) {
-            InsertEditImg(tr, id, table, promptvalue);
+            if(table === "Action") {
+                InsertEditImg(tr, id, table, promptvalue,tab,result[i]);
+        }else{
+                InsertEditImg(tr, id, table, promptvalue);
+            }
         }
         tbl.appendChild(tr)
     }
@@ -654,30 +728,35 @@ function GetValueArray(url, id=null){
     });
 }
 
-function InsertEditImg(tr,id, table, promptvalue){
+function InsertEditImg(tr,id, table, promptvalue,tab = null, data=null){
     var img = document.createElement("IMG");
     var td = document.createElement("TD");
     img.src="../img/icone-edit.png";
-    img.onclick = InsertEditHelper(id, table, promptvalue)
+    img.onclick = InsertEditHelper(id, table, promptvalue,tab,data)
     td.appendChild(img);
     tr.appendChild(td);
 }
 
-function InsertEditHelper(id, table, promptvalue) {
+function InsertEditHelper(id, table, promptvalue, tab, data) {
     return function() {
-        var newValue = prompt(promptvalue);
-        if (newValue !== null) {
-            var url = "PHP/Edit.php";
-            var param = "id1=" + encodeURIComponent(id) + "&table=" + encodeURIComponent(table) + "&newValue=" + encodeURIComponent(newValue);
-            var xhr = new XMLHttpRequest();
-            xhr.onreadystatechange = function() {
-                if (xhr.readyState === 4 && xhr.status === 200) {
-                    Refresh(xhr.response)
-                }
-            };
-            xhr.open("POST", url, true);
-            xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
-            xhr.send(param);
+        if(data !== null){
+            ShowActionForm(tab,data)
+            $("formType").value=1
+        }else{
+            var newValue = prompt(promptvalue);
+            if (newValue !== null) {
+                var url = "PHP/Edit.php";
+                var param = "id1=" + encodeURIComponent(id) + "&table=" + encodeURIComponent(table) + "&newValue=" + encodeURIComponent(newValue);
+                var xhr = new XMLHttpRequest();
+                xhr.onreadystatechange = function() {
+                    if (xhr.readyState === 4 && xhr.status === 200) {
+                        Refresh(xhr.response)
+                    }
+                };
+                xhr.open("POST", url, true);
+                xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+                xhr.send(param);
+            }
         }
     };
 }
@@ -792,11 +871,12 @@ function InsertSelect(el, array, text, value, onChanged,selected, moreOption=[],
         }
         select.appendChild(option);
     }
+
     for (i = 0; i < array.length; i++) {
         option = document.createElement("OPTION");
         option.value = array[i][value];
         option.text = String(array[i][text]).trunc(30, " ", true);
-        if(selected === array[i][value]){
+        if(selected === option.value || selected === array[i][value]){
             option.selected = true;
         }
         select.appendChild(option);
