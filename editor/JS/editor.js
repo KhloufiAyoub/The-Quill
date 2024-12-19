@@ -1,4 +1,6 @@
 init();
+var cptCond = 0;
+var cptInstr = 0;
 
 const conditions = [
     { Cond: "TRUE", par1: null, par2: null },
@@ -88,6 +90,8 @@ function init(){
     $("GetObject").onclick = GetObject;
     $("GetVocab").onclick = GetVocab;
     $("GetAction").onclick = GetAction;
+
+
     GetMaxValue();
 }
 
@@ -177,7 +181,6 @@ function ShowActionForm(str, data=null){
     show("AddAction");
 
     var result
-    var i
     var actionSubmit = $("ActionSubmit");
     var actionTitle = $("ActionTitle");
     actionSubmit.value = "Ajouter";
@@ -233,7 +236,7 @@ function ShowActionForm(str, data=null){
     option2.value = -1;
     option2.selected = true;
     word2.add(option2);
-    for(i = 0; i <  result["vocab"].length; i++){
+    for(var i = 0; i <  result["vocab"].length; i++){
         option = document.createElement("OPTION");
         option.text = result["vocab"][i]["word"];
         option.value = result["vocab"][i]["wid"];
@@ -254,44 +257,14 @@ function ShowActionForm(str, data=null){
         }
         word2.add(option2);
     }
-
-    var condition = $("condition")
-    condition.innerHTML = "";
-    option = document.createElement("OPTION");
-    for(i = 0; i < conditions.length; i++){
-        option = document.createElement("OPTION");
-        option.text = conditions[i]["Cond"];
-        option.value = conditions[i]["Cond"];
-        if(data!=null){
-            if (conditions[i]["Cond"] === data["pgm"]["condition"]["nom"]){
-                option.selected = true;
-            }
-        }
-        condition.add(option);
-    }
-    var instruction = $("instruction")
-    instruction.innerHTML = "";
-    for(i = 0; i < instructions.length; i++) {
-        option = document.createElement("OPTION");
-        option.text = instructions[i]["Instr"];
-        option.value = instructions[i]["Instr"];
-        if (data != null) {
-            if (instructions[i]["Instr"] === data["pgm"]["instruction"]["nom"]) {
-                option.selected = true;
-            }
-        }
-        instruction.add(option);
-    }
-    condition.onchange = ConditionHelper(result,data)
-    instruction.onchange = InstructionHelper(result,data)
-    instruction.dispatchEvent(new Event("change"));
-    condition.dispatchEvent(new Event("change"));
+    InsertCondition(result,data);
+    InsertInstruction(result,data);
 }
 
-function InstructionHelper(result, data=null){
+function InstructionHelper(result,numInstr, data=null){
     return function(ev){
-        var InstDiv = $("InstDiv");
-        InstDiv.innerHTML = "";
+        var instrDiv = $("InstrDiv"+ numInstr+"Param");
+        instrDiv.innerHTML = "";
         var target= ev.target;
         var instruction = target.value;
         var par1, par2;
@@ -301,16 +274,16 @@ function InstructionHelper(result, data=null){
                 par2 = instructions[i]["par2"];
             }
         }
-        SetParamInput(par1, result, InstDiv, 1,data,"instruction");
+        SetParamInput(par1, result, instrDiv,numInstr, 1,data,"instruction");
         var br = document.createElement("BR");
-        InstDiv.appendChild(br);
-        SetParamInput(par2, result, InstDiv, 2, data,"instruction");
+        instrDiv.appendChild(br);
+        SetParamInput(par2, result, instrDiv,numInstr, 2, data,"instruction");
     }
 }
 
-function ConditionHelper(result,data=null){
+function ConditionHelper(result,numCond,data=null){
     return function(ev){
-        var CondDiv = $("CondDiv");
+        var CondDiv = $("CondDiv"+ numCond+"Param");
         CondDiv.innerHTML = "";
         var target= ev.target;
         var condition = target.value;
@@ -321,16 +294,16 @@ function ConditionHelper(result,data=null){
                 par2 = conditions[i]["par2"];
             }
         }
-        SetParamInput(par1, result,CondDiv,1,data,"condition");
+        SetParamInput(par1, result,CondDiv,numCond,1,data,"condition");
         var br = document.createElement("BR");
         CondDiv.appendChild(br);
-        SetParamInput(par2, result, CondDiv,2,data,"condition");
+        SetParamInput(par2, result, CondDiv,numCond,2,data,"condition");
     }
 }
 
-function SetParamInput(par, result, div,num, data,table){
+function SetParamInput(par, result, div,numDiv, num, data,table){
     var label = document.createElement("LABEL");
-    var id = div.id === "CondDiv" ? "CondParam"+num : "InstParam"+num
+    var id = div.id === "CondDiv"+ numDiv+"Param" ? "CondDiv"+ numDiv+"Param"+num : "InstrDiv"+ numDiv+"Param"+num
     var input = document.createElement("INPUT");
     var selected = ""
     if(data !== null){
@@ -409,6 +382,72 @@ function SetParamInput(par, result, div,num, data,table){
     }
 }
 
+function InsertInstruction(result,data){
+    cptInstr++
+    var InstrDiv = $("InstrDiv");
+    var InstrDiv2 = document.createElement("DIV");
+    InstrDiv2.id = "InstrDiv" + cptInstr;
+    var label = document.createElement("LABEL");
+    label.textContent = "Instruction  "+cptInstr+": ";
+    label.htmlFor = "instruction" + cptInstr;
+    InstrDiv2.appendChild(label);
+    var select = document.createElement("SELECT");
+    select.id = "instruction" + cptInstr;
+    var option = document.createElement("OPTION");
+    for(var i = 0; i < instructions.length; i++){
+        option = document.createElement("OPTION");
+        option.text = instructions[i]["Instr"];
+        option.value = instructions[i]["Instr"];
+        if(data!=null){
+            if (instructions[i]["Instr"] === data["pgm"]["instruction"]["nom"]){
+                option.selected = true;
+            }
+        }
+        select.add(option);
+    }
+    InstrDiv2.appendChild(select);
+    InstrDiv2.appendChild(document.createElement("BR"));
+    InstrDiv.appendChild(InstrDiv2);
+    var InstrDiv2Param = document.createElement("DIV");
+    InstrDiv2Param.id = "InstrDiv" +cptInstr+ "Param";
+    InstrDiv2.appendChild(InstrDiv2Param);
+    select.onchange = InstructionHelper(result,cptInstr,data)
+    select.dispatchEvent(new Event("change"));
+}
+
+function InsertCondition(result,data){
+    cptCond++;
+    var CondDiv = $("CondDiv");
+    var CondDiv2 = document.createElement("DIV");
+    CondDiv2.id = "CondDiv" + cptCond;
+    var label = document.createElement("LABEL");
+    label.textContent = "Condition  "+cptCond+": ";
+    label.htmlFor = "condition" + cptCond;
+    CondDiv2.appendChild(label);
+    var select = document.createElement("SELECT");
+    select.id = "condition" + cptCond;
+    var option = document.createElement("OPTION");
+    for(var i = 0; i < conditions.length; i++){
+        option = document.createElement("OPTION");
+        option.text = conditions[i]["Cond"];
+        option.value = conditions[i]["Cond"];
+        if(data!=null){
+            if (conditions[i]["Cond"] === data["pgm"]["condition"]["nom"]){
+                option.selected = true;
+            }
+        }
+        select.add(option);
+    }
+    CondDiv2.appendChild(select);
+    CondDiv2.appendChild(document.createElement("BR"));
+    CondDiv.appendChild(CondDiv2);
+    var CondDiv2Param = document.createElement("DIV");
+    CondDiv2Param.id = "CondDiv" +cptCond+ "Param";
+    CondDiv2.appendChild(CondDiv2Param);
+    select.onchange = ConditionHelper(result,cptCond,data)
+    select.dispatchEvent(new Event("change"));
+}
+
 function Add(url,param, elements){
     for (var i = 0; i < elements.length; i++){
         elements[i].value = "";
@@ -470,21 +509,32 @@ function AddAction(){
     var tblNum = $("tblNum").value;
     var wid1 = $("word1").value;
     var wid2 = $("word2").value;
-    var condition = $("condition").value;
-    var condParam1 = $("CondParam1").value;
-    var condParam2 = $("CondParam2").value;
-    var instruction = $("instruction").value;
-    var instParam1 = $("InstParam1").value;
-    var instParam2 = $("InstParam2").value;
-
     var url="PHP/AddAction.php";
     var param = "aid="+encodeURIComponent(aid)
     param = param + "&tbl="+encodeURIComponent(tblNum)
     param = param + "&wid1=" + encodeURIComponent(wid1)
     param = param + "&wid2=" + encodeURIComponent(wid2)
-    var pgm = {"condition": {"nom" : condition, "param1": condParam1, "param2":condParam2},
-                                                                            "instruction": {"nom" : instruction, "param1" : instParam1, "param2" : instParam2}}
+
+    var condTab={}
+
+    for (var i = 1; i <= cptCond; i++){
+        var condition = $("condition"+i).value;
+        var condParam1 = $("CondDiv"+i+"Param1").value;
+        var condParam2 = $("CondDiv"+i+"Param2").value;
+
+        condTab[i] = {"nom" : condition, "param1": condParam1, "param2":condParam2}
+    }
+    var instTab={}
+    for (i = 1; i <= cptInstr; i++) {
+        var instruction = $("instruction" + i).value;
+        var instParam1 = $("InstrDiv" + i + "Param1").value;
+        var instParam2 = $("InstrDiv" + i + "Param2").value;
+        instTab[i] = {"nom": instruction, "param1": instParam1, "param2": instParam2}
+    }
+    var pgm = {"condition" : condTab, "instruction" : instTab}
     param = param + "&pgm=" + encodeURIComponent(JSON.stringify(pgm));
+    console.log(pgm)
+
     Add(url,param,[tblNum,wid1,wid2,condition,condParam1,condParam2,instruction,instParam1,instParam2]);
     hide("AddAction");
 }
@@ -821,9 +871,18 @@ function InsertColumn(tr, item, isTab=false){
     if (isTab){
         var str = "";
         for(var i in item){
-            str += i + " : " + item[i]["nom"] + "\n";
-            str += "\tparam1"+ " : " + item[i]["param1"] + "\n";
-            str += "\tparam2"+ " : " + item[i]["param2"] + "\n";
+            for(var j in item[i]){
+                console.log(item[i][j])
+                if(i === "condition"){
+                    str += "Condition " +j+" : " + item[i][j]["nom"] + "\n";
+                    str += "\tparam1"+ " : " + item[i][j]["param1"] + "\n";
+                    str += "\tparam2"+ " : " + item[i][j]["param2"] + "\n";
+                }else{
+                    str += "Instruction " +j+" : " + item[i][j]["nom"] + "\n";
+                    str += "\tparam1"+ " : " + item[i][j]["param1"] + "\n";
+                    str += "\tparam2"+ " : " + item[i][j]["param2"] + "\n";
+                }
+            }
         }
         var tn1 = document.createTextNode(str);
         td.appendChild(tn1);
