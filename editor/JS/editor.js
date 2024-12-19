@@ -198,6 +198,15 @@ function ShowActionForm(str, data=null){
         aid.value = data["aid"];
     }
 
+    cptCond = 0;
+    cptInstr = 0
+
+    $("CondDiv").innerHTML = "";
+    $("InstrDiv").innerHTML = "";
+
+    $("addCondition").onclick = function(){InsertCondition(result,data)};
+    $("addInstruction").onclick = function(){InsertInstruction(result,data)};
+
     var option = document.createElement("OPTION");
     var option2 = document.createElement("OPTION");
 
