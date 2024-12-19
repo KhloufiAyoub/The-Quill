@@ -222,11 +222,11 @@ function ShowActionForm(str, data=null){
     option2 = document.createElement("OPTION");
 
     option.text = "-----";
-    option.value = null;
+    option.value = "null";
     option.selected = true;
     word1.add(option);
     option2.text = "-----";
-    option2.value = null;
+    option2.value = "null";
     option2.selected = true;
     word2.add(option2);
     for(i = 0; i <  result["vocab"].length; i++){
@@ -399,7 +399,7 @@ function SetParamInput(par, result, div,num, data,table){
             input = document.createElement("INPUT");
             input.type = "hidden";
             input.id = id;
-            input.value = null;
+            input.value = "null";
             div.appendChild(input);
             break
     }
@@ -470,8 +470,8 @@ function AddAction(){
     var condParam2 = $("CondParam2").value;
     var instruction = $("instruction").value;
     var instParam1 = $("InstParam1").value;
-
     var instParam2 = $("InstParam2").value;
+
     var url="PHP/AddAction.php";
     var param = "formType="+encodeURIComponent($("formType").value)
     param = param + "tbl="+encodeURIComponent(tblNum)
@@ -741,7 +741,6 @@ function InsertEditHelper(id, table, promptvalue, tab, data) {
     return function() {
         if(data !== null){
             ShowActionForm(tab,data)
-            $("formType").value=1
         }else{
             var newValue = prompt(promptvalue);
             if (newValue !== null) {
