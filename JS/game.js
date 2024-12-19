@@ -115,7 +115,7 @@ function action(str) {
             stateMachine();
             break;
         case "TEXT":
-            area.value += result["str"] + "\n\n";
+            area.value += result["str"].replace(/<br>/g, "\n") + "\n\n";
             area.scrollTop = area.scrollHeight;
             stateMachine();
             break;
@@ -176,6 +176,7 @@ function stateMachine(){
 }
 
 function startSession() {
+    console.log("Session Start");
     var url = "PHP/SessionStart.php";
     var xhr = new XMLHttpRequest();
     xhr.open("POST", url, true);

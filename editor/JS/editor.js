@@ -183,12 +183,16 @@ function ShowActionForm(str, data=null){
     actionSubmit.value = "Ajouter";
     actionTitle.textContent = "Ajouter une action";
 
+    var aid = $("aid");
+
     if(data==null){
         result = JSON.parse(str);
+        aid.value = -1
     }else{
         result= str
         actionSubmit.value = "Modifier";
         actionTitle.textContent = "Modifier l'action";
+        aid.value = data["aid"];
     }
 
     var option = document.createElement("OPTION");
@@ -222,11 +226,11 @@ function ShowActionForm(str, data=null){
     option2 = document.createElement("OPTION");
 
     option.text = "-----";
-    option.value = "null";
+    option.value = -1;
     option.selected = true;
     word1.add(option);
     option2.text = "-----";
-    option2.value = "null";
+    option2.value = -1;
     option2.selected = true;
     word2.add(option2);
     for(i = 0; i <  result["vocab"].length; i++){
@@ -399,7 +403,7 @@ function SetParamInput(par, result, div,num, data,table){
             input = document.createElement("INPUT");
             input.type = "hidden";
             input.id = id;
-            input.value = "null";
+            input.value = 0;
             div.appendChild(input);
             break
     }
@@ -462,6 +466,7 @@ function AddMove(){
 }
 
 function AddAction(){
+    var aid = $("aid").value;
     var tblNum = $("tblNum").value;
     var wid1 = $("word1").value;
     var wid2 = $("word2").value;
@@ -473,8 +478,8 @@ function AddAction(){
     var instParam2 = $("InstParam2").value;
 
     var url="PHP/AddAction.php";
-    var param = "formType="+encodeURIComponent($("formType").value)
-    param = param + "tbl="+encodeURIComponent(tblNum)
+    var param = "aid="+encodeURIComponent(aid)
+    param = param + "&tbl="+encodeURIComponent(tblNum)
     param = param + "&wid1=" + encodeURIComponent(wid1)
     param = param + "&wid2=" + encodeURIComponent(wid2)
     var pgm = {"condition": {"nom" : condition, "param1": condParam1, "param2":condParam2},
@@ -545,13 +550,13 @@ function SplitValue(response){
     $("maxSave").value=split[1];
 }
 
-function Get(url, elements,table, promptvalue= null, isDeletable=true, isEditable=true, UseInnerHTML=false){
+function Get(url, elements,table, promptvalue= null, isDeletable=true, isEditable=true){
     hide("ActionButton");
     hide("AddAction");
     var xhr= new XMLHttpRequest();
     xhr.onreadystatechange = function(){
         if (xhr.readyState === 4 && xhr.status === 200){
-            ProcessRequest(xhr.responseText, elements,table, promptvalue, isDeletable, isEditable, UseInnerHTML);
+            ProcessRequest(xhr.responseText, elements,table, promptvalue, isDeletable, isEditable);
         }
     }
     xhr.open("POST",url,true);
@@ -560,17 +565,17 @@ function Get(url, elements,table, promptvalue= null, isDeletable=true, isEditabl
 
 function GetRoom(){
     var url="PHP/GetRoom.php";
-    Get(url,["rid","roomdesc"], "Piece","Nouvelle description de la pièce :" ,true,true,true);
+    Get(url,["rid","roomdesc"], "Piece","Nouvelle description de la pièce :" ,true,true);
 }
 
 function GetMessage(){
     var url="PHP/GetMessage.php";
-    Get(url,["mid","message"],"Message", "Nouveau message :",true,true,true);
+    Get(url,["mid","message"],"Message", "Nouveau message :",true,true);
 }
 
 function GetSmsg(){
     var url="PHP/GetSmsg.php";
-    Get(url,["smid","message"], "SMessage",null,false, false, true)
+    Get(url,["smid","message"], "SMessage",null,false, false)
 }
 
 function GetMove(){
@@ -588,7 +593,7 @@ function GetAction(){
     var xhr= new XMLHttpRequest();
     xhr.onreadystatechange = function(){
         if (xhr.readyState === 4 && xhr.status === 200){
-            ProcessRequest(xhr.responseText, ["tbl","wid1", "wid2", "pgm"],"Action", null, true, true, false, "action");
+            ProcessRequest(xhr.responseText, ["tbl","wid1", "wid2", "pgm"],"Action", null, true, true, "action");
             show("ActionButton");
             $("ActionButton").onclick = function(){ShowActionForm(xhr.responseText)};
         }
@@ -597,7 +602,7 @@ function GetAction(){
     xhr.send();
 }
 
-function ProcessRequest(str,elements,table, promptvalue, isDeletable, isEditable, UseInnerHTML, table2=null){
+function ProcessRequest(str,elements,table, promptvalue, isDeletable, isEditable, table2=null){
     var result = JSON.parse(str);
 
     if(table2 !== null){
@@ -634,7 +639,7 @@ function ProcessRequest(str,elements,table, promptvalue, isDeletable, isEditable
             if(table === "Deplacement") {
                 InsertDeleteImg(tr, id, table, result[i][elements[1]])
             }else if(table === "Action"){
-                InsertDeleteImg(tr, id, table, result[i][elements[1]], result[i][elements[2]])
+                InsertDeleteImg(tr, result[i]["aid"], table)
             }else if(table === "Vocab"){
                 InsertDeleteImg(tr, id, table,result[i][elements[1]]);
             }else{
@@ -810,8 +815,6 @@ function Refresh (str){
             break;
     }
 }
-
-//TODO : Pas de InnerHTML
 
 function InsertColumn(tr, item, isTab=false){
     var td = document.createElement("TD");
