@@ -91,6 +91,8 @@ function init(){
     $("GetVocab").onclick = GetVocab;
     $("GetAction").onclick = GetAction;
 
+    $("minusCondition").onclick = RemoveCondition
+    $("minusInstruction").onclick = RemoveInstruction
 
     GetMaxValue();
 }
@@ -266,8 +268,34 @@ function ShowActionForm(str, data=null){
         }
         word2.add(option2);
     }
-    InsertCondition(result,data);
-    InsertInstruction(result,data);
+
+    if(data != null){
+        for(i in data["pgm"]["condition"]){
+            InsertCondition(result,data["pgm"]["condition"][i]);
+        }
+        for(i in data["pgm"]["instruction"]){
+            InsertInstruction(result,data["pgm"]["instruction"][i]);
+        }
+    }else{
+        InsertCondition(result,data);
+        InsertInstruction(result,data);
+    }
+}
+
+function RemoveCondition(){
+    if(cptCond>0){
+        var div = $("CondDiv"+cptCond);
+        div.remove();
+        cptCond--;
+    }
+}
+
+function RemoveInstruction(){
+    if(cptInstr>0){
+        var div = $("InstrDiv"+cptInstr);
+        div.remove();
+        cptInstr--;
+    }
 }
 
 function InstructionHelper(result,numInstr, data=null){
@@ -310,13 +338,13 @@ function ConditionHelper(result,numCond,data=null){
     }
 }
 
-function SetParamInput(par, result, div,numDiv, num, data,table){
+function SetParamInput(par, result, div,numDiv, num, data){
     var label = document.createElement("LABEL");
     var id = div.id === "CondDiv"+ numDiv+"Param" ? "CondDiv"+ numDiv+"Param"+num : "InstrDiv"+ numDiv+"Param"+num
     var input = document.createElement("INPUT");
     var selected = ""
     if(data !== null){
-        selected = data["pgm"][table]["param"+num];
+        selected = data["param"+num];
     }
     switch(par){
         case "room":
@@ -408,7 +436,7 @@ function InsertInstruction(result,data){
         option.text = instructions[i]["Instr"];
         option.value = instructions[i]["Instr"];
         if(data!=null){
-            if (instructions[i]["Instr"] === data["pgm"]["instruction"]["nom"]){
+            if (instructions[i]["Instr"] === data["nom"]){
                 option.selected = true;
             }
         }
@@ -441,7 +469,7 @@ function InsertCondition(result,data){
         option.text = conditions[i]["Cond"];
         option.value = conditions[i]["Cond"];
         if(data!=null){
-            if (conditions[i]["Cond"] === data["pgm"]["condition"]["nom"]){
+            if (conditions[i]["Cond"] === data["nom"]){
                 option.selected = true;
             }
         }
@@ -459,7 +487,9 @@ function InsertCondition(result,data){
 
 function Add(url,param, elements){
     for (var i = 0; i < elements.length; i++){
-        elements[i].value = "";
+        if(!(elements[i] === undefined)){
+            elements[i].value = "";
+        }
     }
     var xhr= new XMLHttpRequest();
     xhr.open("POST",url,true);
