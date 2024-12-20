@@ -542,7 +542,6 @@ function AddAction(){
     }
     var pgm = {"condition" : condTab, "instruction" : instTab}
     param = param + "&pgm=" + encodeURIComponent(JSON.stringify(pgm));
-    console.log(pgm)
 
     Add(url,param,[tblNum,wid1,wid2,condition,condParam1,condParam2,instruction,instParam1,instParam2]);
     hide("AddAction");
@@ -881,7 +880,6 @@ function InsertColumn(tr, item, isTab=false){
         var str = "";
         for(var i in item){
             for(var j in item[i]){
-                console.log(item[i][j])
                 if(i === "condition"){
                     str += "Condition " +j+" : " + item[i][j]["nom"] + "\n";
                     str += "\tparam1"+ " : " + item[i][j]["param1"] + "\n";
