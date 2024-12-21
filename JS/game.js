@@ -1,5 +1,6 @@
 init();
 setInterval(startSession, 180000);
+var timeOutId=null;
 
 function init(){
     var logout = $("logout");
@@ -104,6 +105,7 @@ function endgame(){
 function action(str) {
     var result = JSON.parse(str);
     var area = $("area");
+    timeOutId = null;
     switch(result["action"]){
         case "CMD":
             $("submitInput").disabled = false;
@@ -125,9 +127,28 @@ function action(str) {
         case "NOP":
             stateMachine();
             break;
+        case "PAUSE":
+            if(result["time"] != null){
+                timeOutId = setTimeout(stateMachine, result["time"]);
+            }
+            break;
+        case "LOGOUT":
+            logout()
+            break;
     }
 }
 
+function logout(){
+    var url="PHP/Logout.php";
+    var xhr= new XMLHttpRequest();
+    xhr.onreadystatechange = function(){
+        if (xhr.readyState === 4 && xhr.status === 200){
+            hideGameScreen();
+        }
+    }
+    xhr.open("POST",url,true);
+    xhr.setRequestHeader("Content-Type","application/x-www-form-urlencoded");
+}
 
 function reset(){
     var url="PHP/Init.php";
@@ -143,6 +164,9 @@ function reset(){
 }
 
 function getCommand(){
+    if(timeOutId != null){
+        clearTimeout(timeOutId);
+    }
     $("submitInput").disabled = true;
     $("logout").disabled = true;
     var gameInput = $("gameInput");
@@ -159,7 +183,6 @@ function getCommand(){
     xhr.open("POST",url,true);
     xhr.setRequestHeader("Content-Type","application/x-www-form-urlencoded");
     xhr.send(param);
-
 }
 
 function stateMachine(){
@@ -179,7 +202,6 @@ function startSession() {
     console.log("Session Start");
     var url = "PHP/SessionStart.php";
     var xhr = new XMLHttpRequest();
-    xhr.open("POST", url, true);
-    xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+    xhr.open("GET", url, true);
     xhr.send();
 }
