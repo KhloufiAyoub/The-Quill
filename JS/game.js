@@ -135,6 +135,15 @@ function action(str) {
         case "LOGOUT":
             logout()
             break;
+        case "SAVE":
+            //fonction save
+            break;
+        case "LOAD":
+            loadGame();
+            break;
+        case "ANYKEY":
+
+            break;
     }
 }
 
@@ -176,8 +185,8 @@ function getCommand(){
     var xhr= new XMLHttpRequest();
     xhr.onreadystatechange = function(){
         if (xhr.readyState === 4 && xhr.status === 200){
-            action(xhr.responseText);
             console.log(xhr.responseText);
+            action(xhr.responseText);
             gameInput.value = "";
         }
     }
@@ -191,8 +200,8 @@ function stateMachine(){
     var xhr= new XMLHttpRequest();
     xhr.onreadystatechange = function(){
         if (xhr.readyState === 4 && xhr.status === 200){
-            action(xhr.responseText);
             console.log(xhr.responseText);
+            action(xhr.responseText);
         }
     }
     xhr.open("POST",url,true);

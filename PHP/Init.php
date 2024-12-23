@@ -9,7 +9,7 @@ $positionObj=[];
 $stm=$dbh->prepare("SELECT objid, startloc FROM obj ORDER BY objid");
 $stm->execute();
 while ($row=$stm->fetch()) {
-    $positionObj[]=array("objid"=>$row["objid"], "startloc"=>$row["startloc"]);
+    $positionObj[]=array("objid"=>$row["objid"], "pos"=>$row["startloc"]);
 }
 
 $stm=$dbh->prepare("SELECT COUNT(objid) FROM obj WHERE startloc=-3");
@@ -29,7 +29,10 @@ $_SESSION["etat_partie"] = array(
         "mots_entres" => [],
         "table_en_cours" => "",
         "entree_table" => "",
-        "ligne_action" => -1
+        "ligne_action" => -1,
+        "num_instruction" => 0,
+        "nbr_tours" => 0,
+        "score" =>0
     )
 );
 
