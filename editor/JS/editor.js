@@ -554,7 +554,7 @@ function AddAction(){
     param = param + "&wid1=" + encodeURIComponent(wid1)
     param = param + "&wid2=" + encodeURIComponent(wid2)
 
-    var condTab={}
+    var condTab=[]
 
     for (var i = 1; i <= cptCond; i++){
         var condition = $("condition"+i).value;
@@ -563,7 +563,7 @@ function AddAction(){
 
         condTab[i] = {"nom" : condition, "param1": condParam1, "param2":condParam2}
     }
-    var instTab={}
+    var instTab=[]
     for (i = 1; i <= cptInstr; i++) {
         var instruction = $("instruction" + i).value;
         var instParam1 = $("InstrDiv" + i + "Param1").value;

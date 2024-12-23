@@ -177,6 +177,7 @@ function getCommand(){
     xhr.onreadystatechange = function(){
         if (xhr.readyState === 4 && xhr.status === 200){
             action(xhr.responseText);
+            console.log(xhr.responseText);
             gameInput.value = "";
         }
     }
@@ -191,6 +192,7 @@ function stateMachine(){
     xhr.onreadystatechange = function(){
         if (xhr.readyState === 4 && xhr.status === 200){
             action(xhr.responseText);
+            console.log(xhr.responseText);
         }
     }
     xhr.open("POST",url,true);

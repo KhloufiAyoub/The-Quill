@@ -34,6 +34,7 @@ switch ($_SESSION["etat_partie"]["jeu"]["etat_machine"]) {
             }else {
                 if ($_SESSION["etat_partie"]["jeu"]["table_en_cours"] === "status") {
                     $_SESSION["etat_partie"]["jeu"]["etat_machine"] = "getCommandMessage";
+                    echo json_encode(array("action" => "NOP"));
                 }elseif($_SESSION["etat_partie"]["jeu"]["table_en_cours"] === "action"){
                     if($_SESSION["etat_partie"]["jeu"]["entree_table"][0]<13){
                         $stm=$dbh->prepare("SELECT message FROM smsg WHERE smid=7");
@@ -46,8 +47,9 @@ switch ($_SESSION["etat_partie"]["jeu"]["etat_machine"]) {
                     $_SESSION["etat_partie"]["jeu"]["etat_machine"]="getCommand";
                     $_SESSION["etat_partie"]["affichage"][]=$row["message"];
                     echo json_encode(array("action"=>"TEXT", "str"=>$row["message"]));
+                }else{
+                    echo json_encode(array("action" => "NOP"));
                 }
-                echo json_encode(array("action" => "NOP"));
             }
         }
         break;
@@ -158,7 +160,6 @@ function decodeCommand(): void{
             if ($row=$stm->fetch()) {
                 $_SESSION["etat_partie"]["piece"]=$row["newroom"];
                 $_SESSION["etat_partie"]["jeu"]["etat_machine"]="clear";
-                echo json_encode(array("action"=>"NOP"));
             }else{
                 $_SESSION["etat_partie"]["jeu"]["etat_machine"]="tbl";
                 $_SESSION["etat_partie"]["jeu"]["ligne_action"] = 0;
@@ -171,54 +172,55 @@ function decodeCommand(): void{
                 if($_SESSION["etat_partie"]["flags"][9] != 0 && $_SESSION["etat_partie"]["flags"][0] !== 0) $_SESSION["etat_partie"]["flags"][9]--;
                 if($_SESSION["etat_partie"]["flags"][10] != 0 && $_SESSION["etat_partie"]["flags"][0] !== 0 && $_SESSION["etat_partie"]["positionObj"][0] === -1) $_SESSION["etat_partie"]["flags"][10]--;
                 $_SESSION["etat_partie"]["flags"][31]++;
-
-                echo json_encode(array("action"=>"NOP"));
             }
+            echo json_encode(array("action"=>"NOP"));
         }
     }
 }
 
 function CheckCondition($wid1, $wid2, $pgm): bool{
     global $dbh;
-    $pgm = unserialize($pgm);
     if (($wid1 != $_SESSION["etat_partie"]["jeu"]["entree_table"][0] && $wid1 != -1) || ($wid2 != $_SESSION["etat_partie"]["jeu"]["entree_table"][1] && $wid2 != -1)) {
         return false;
     }else{
-        switch ($pgm["condition"]) {
-            case "TRUE":
-                break;
-            case "AT":
-                break;
-            case "NOTAT":
-                break;
-            case "ATGT":
-                break;
-            case "ATLT":
-                break;
-            case "PRESENT":
-                break;
-            case "ABSENT":
-                break;
-            case "WORN":
-                break;
-            case "NOTWORN":
-                break;
-            case "CARRIED":
-                break;
-            case "NOTCARR":
-                break;
-            case "CHANCE":
-                break;
-            case "ZERO":
-                break;
-            case "NOTZERO":
-                break;
-            case "EQ":
-                break;
-            case "GT":
-                break;
-            case "LT":
-                break;
+        $pgm = unserialize($pgm);
+        foreach ($pgm["condition"] as $condition) {
+            switch ($condition["nom"]) {
+                case "TRUE":
+                    break;
+                case "AT":
+                    break;
+                case "NOTAT":
+                    break;
+                case "ATGT":
+                    break;
+                case "ATLT":
+                    break;
+                case "PRESENT":
+                    break;
+                case "ABSENT":
+                    break;
+                case "WORN":
+                    break;
+                case "NOTWORN":
+                    break;
+                case "CARRIED":
+                    break;
+                case "NOTCARR":
+                    break;
+                case "CHANCE":
+                    break;
+                case "ZERO":
+                    break;
+                case "NOTZERO":
+                    break;
+                case "EQ":
+                    break;
+                case "GT":
+                    break;
+                case "LT":
+                    break;
+            }
         }
         return true;
     }
