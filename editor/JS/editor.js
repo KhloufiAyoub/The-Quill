@@ -571,6 +571,7 @@ function AddAction(){
         instTab[i] = {"nom": instruction, "param1": instParam1, "param2": instParam2}
     }
     var pgm = {"condition" : condTab, "instruction" : instTab}
+    console.log(pgm)
     param = param + "&pgm=" + encodeURIComponent(JSON.stringify(pgm));
 
     Add(url,param,[tblNum,wid1,wid2,condition,condParam1,condParam2,instruction,instParam1,instParam2]);
@@ -908,14 +909,16 @@ function InsertColumn(tr, item, isTab=false){
     var td = document.createElement("TD");
     if (isTab){
         var str = "";
+        var num=1;
         for(var i in item){
             for(var j in item[i]){
-                if(i === "condition"){
-                    str += "Condition " +j+" : " + item[i][j]["nom"] + "\n";
+                num = j;
+                if(i === "condition" && item[i][j] !== null){
+                    str += "Condition " + num + " : " + item[i][j]["nom"] + "\n";
                     str += "\tparam1"+ " : " + item[i][j]["param1"] + "\n";
                     str += "\tparam2"+ " : " + item[i][j]["param2"] + "\n";
-                }else{
-                    str += "Instruction " +j+" : " + item[i][j]["nom"] + "\n";
+                }else if(item[i][j] !== null){
+                    str += "Instruction " + num + " : " + item[i][j]["nom"] + "\n";
                     str += "\tparam1"+ " : " + item[i][j]["param1"] + "\n";
                     str += "\tparam2"+ " : " + item[i][j]["param2"] + "\n";
                 }

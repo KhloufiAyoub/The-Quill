@@ -67,17 +67,19 @@ function affichage(str){
 }
 
 function ProcessLogin(response){
-    $("psw").value = "";
+    var psw = $("psw");
+    psw.value = "";
     if(response !== "error"){
         $("username").value = "";
         loadGame();
+    }else{
+        psw.focus();
     }
 }
 
 function showGameScreen(){
     hide("auth");
     show("game");
-    $("gameInput").focus();
     getAffichage();
 }
 
@@ -142,7 +144,10 @@ function action(str) {
             loadGame();
             break;
         case "ANYKEY":
-
+            document.addEventListener("keydown", function handler(event) {
+            stateMachine();
+            document.removeEventListener("keydown", handler);
+            });
             break;
     }
 }
