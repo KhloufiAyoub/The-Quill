@@ -35,5 +35,3 @@ $_SESSION["etat_partie"] = array(
         "score" =>0
     )
 );
-
-

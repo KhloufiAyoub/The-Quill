@@ -13,6 +13,4 @@ while ($row=$stm->fetch()){
     $a[]=$value;
 }
 
-
-
 echo json_encode($a);

@@ -95,6 +95,7 @@ function description(): void{
             $stm = $dbh->prepare("SELECT message FROM smsg WHERE smid=0 ");
             $stm->execute();
             $row=$stm->fetch();
+            $_SESSION["etat_partie"]["affichage"][]=$row["message"];
             echo json_encode(array("action"=>"TEXT", "str"=>$row["message"]));
         }
     }else{
@@ -389,8 +390,10 @@ function CheckInstruction($pgm): void{
                 $stm4=$dbh->prepare("SELECT message FROM smsg WHERE smid=11");
                 $stm4->execute();
                 $row4=$stm4->fetch();
+                $_SESSION["etat_partie"]["affichage"][]=$row4["message"];
                 echo json_encode(array("action" => "TEXT", "str" => $row4["message"]));
             }else{
+                $_SESSION["etat_partie"]["affichage"][]=$message;
                 echo json_encode(array("action" => "TEXT", "str" => $message));
             }
             break;
@@ -413,6 +416,7 @@ function CheckInstruction($pgm): void{
             $stm->execute();
             $row=$stm->fetch();
             $_SESSION["etat_partie"]["jeu"]["etat_machine"]="getCommand";
+            $_SESSION["etat_partie"]["affichage"][]=$row["message"];
             echo json_encode(array("action" => "TEXT", "str" => $row["message"]));
             break;
         case "ANYKEY":
@@ -445,7 +449,7 @@ function CheckInstruction($pgm): void{
             $stm->execute();
             $row= $stm->fetch();
             $message .= $row["message"];
-
+            $_SESSION["etat_partie"]["affichage"][]=$message;
             echo json_encode(array("TEXT" => $message));
             break;
         case "SCORE":
@@ -455,7 +459,9 @@ function CheckInstruction($pgm): void{
             $stm2->execute();
             $row=$stm->fetch();
             $row2=$stm2->fetch();
-            echo json_encode(array("action" => "TEXT", "str" => $row["message"].$_SESSION["etat_partie"]["jeu"]["score"].$row2["message"]));
+            $message = $row["message"].$_SESSION["etat_partie"]["jeu"]["score"].$row2["message"];
+            $_SESSION["etat_partie"]["affichage"][]=$message;
+            echo json_encode(array("action" => "TEXT", "str" => $message));
             break;
         case "CLS":
             $_SESSION["etat_partie"]["affichage"] = [];
@@ -499,12 +505,14 @@ function CheckInstruction($pgm): void{
                 $stm->execute();
                 $row = $stm->fetch();
                 $_SESSION["etat_partie"]["jeu"]["etat_machine"] = "getCommand";
+                $_SESSION["etat_partie"]["affichage"][]=$row["message"];
                 echo json_encode(array("action" => "TEXT", "str" => $row["message"]));
             }elseif ($maxObj == $_SESSION["etat_partie"]["flags"][1]) {
                 $stm = $dbh->prepare("SELECT message FROM smsg WHERE smid=24");
                 $stm->execute();
                 $row = $stm->fetch();
                 $_SESSION["etat_partie"]["jeu"]["etat_machine"] = "getCommand";
+                $_SESSION["etat_partie"]["affichage"][]=$row["message"];
                 echo json_encode(array("action" => "TEXT", "str" => $row["message"]));
             }else{
                 $_SESSION["etat_partie"]["positionObj"][$obj]["pos"] = -3;
@@ -537,18 +545,21 @@ function CheckInstruction($pgm): void{
                 $stm->execute();
                 $row = $stm->fetch();
                 $_SESSION["etat_partie"]["jeu"]["etat_machine"] = "getCommand";
+                $_SESSION["etat_partie"]["affichage"][]=$row["message"];
                 echo json_encode(array("action" => "TEXT", "str" => $row["message"]));
             }elseif ($_SESSION["etat_partie"]["positionObj"][$obj]["pos"] != $_SESSION["etat_partie"]["piece"]) {
                 $stm = $dbh->prepare("SELECT message FROM smsg WHERE smid=26");
                 $stm->execute();
                 $row = $stm->fetch();
                 $_SESSION["etat_partie"]["jeu"]["etat_machine"] = "getCommand";
+                $_SESSION["etat_partie"]["affichage"][]=$row["message"];
                 echo json_encode(array("action" => "TEXT", "str" => $row["message"]));
             }elseif ($_SESSION["etat_partie"]["flags"][1] == $maxObj) {
                 $stm = $dbh->prepare("SELECT message FROM smsg WHERE smid=27");
                 $stm->execute();
                 $row = $stm->fetch();
                 $_SESSION["etat_partie"]["jeu"]["etat_machine"] = "getCommand";
+                $_SESSION["etat_partie"]["affichage"][]=$row["message"];
                 echo json_encode(array("action" => "TEXT", "str" => $row["message"]));
             }else{
                 $_SESSION["etat_partie"]["positionObj"][$obj]["pos"] = -3;
@@ -575,12 +586,14 @@ function CheckInstruction($pgm): void{
                 $stm->execute();
                 $row = $stm->fetch();
                 $_SESSION["etat_partie"]["jeu"]["etat_machine"]="getCommand";
+                $_SESSION["etat_partie"]["affichage"][]=$row["message"];
                 echo json_encode(array("action" => "TEXT", "str" => $row["message"]));
             }elseif ($_SESSION["etat_partie"]["positionObj"][$obj]["pos"] != -3){
                 $stm = $dbh->prepare("SELECT message FROM smsg WHERE smid=28");
                 $stm->execute();
                 $row = $stm->fetch();
                 $_SESSION["etat_partie"]["jeu"]["etat_machine"] = "getCommand";
+                $_SESSION["etat_partie"]["affichage"][]=$row["message"];
                 echo json_encode(array("action" => "TEXT", "str" => $row["message"]));
             }else{
                 $_SESSION["etat_partie"]["positionObj"][$obj]["pos"] = -2;
@@ -612,6 +625,7 @@ function CheckInstruction($pgm): void{
                     $stm->execute();
                     $row = $stm->fetch();
                     $_SESSION["etat_partie"]["jeu"]["etat_machine"]="getCommand";
+                    $_SESSION["etat_partie"]["affichage"][]=$row["message"];
                     echo json_encode(array("action" => "TEXT", "str" => $row["message"]));
                 }else{
                     echo json_encode(array("action" => "NOP"));
@@ -622,6 +636,7 @@ function CheckInstruction($pgm): void{
                     $stm->execute();
                     $row = $stm->fetch();
                     $_SESSION["etat_partie"]["jeu"]["etat_machine"]="getCommand";
+                    $_SESSION["etat_partie"]["affichage"][]=$row["message"];
                     echo json_encode(array("action" => "TEXT", "str" => $row["message"]));
                 }else{
                     $_SESSION["etat_partie"]["positionObj"][$obj]["pos"] = $_SESSION["etat_partie"]["piece"];
@@ -704,6 +719,7 @@ function CheckInstruction($pgm): void{
             $stm = $dbh->prepare("SELECT message FROM msg WHERE mid=?");
             $stm->execute(array((int)$instruction["param1"]));
             $row = $stm->fetch();
+            $_SESSION["etat_partie"]["affichage"][]=$row["message"];
             echo json_encode(array("action" => "TEXT", "str" => $row["message"]));
             break;
         case "SET":

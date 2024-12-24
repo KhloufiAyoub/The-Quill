@@ -14,7 +14,3 @@ if (isset($_POST["msg"])){
 }
 
 echo "message";
-
-
-
-

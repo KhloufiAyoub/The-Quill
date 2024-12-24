@@ -39,4 +39,3 @@ if (isset($_POST["username"]) && isset($_POST["psw"])) {
 }else{
     echo "error";
 }
-

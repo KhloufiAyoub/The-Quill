@@ -12,9 +12,5 @@ if (isset($_POST["room"])){
         }
     }
 }
+
 echo "piece";
-
-
-
-
-

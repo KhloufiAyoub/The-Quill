@@ -14,6 +14,3 @@ if (isset($_POST["rid"]) && isset($_POST["wid"]) && isset($_POST["newroom"])){
 }
 
 echo "deplacement";
-
-
-

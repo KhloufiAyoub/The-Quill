@@ -14,7 +14,3 @@ if (isset($_POST["obj"])){
 }
 
 echo "objet";
-
-
-
-

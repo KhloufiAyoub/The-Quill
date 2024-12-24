@@ -12,4 +12,3 @@ if ($row=$stm->fetch()) {
     $_SESSION["etat_partie"]["jeu"]["etat_machine"]="initialisation";
     $_SESSION["etat_partie"]["affichage"]=[];
 }
-
