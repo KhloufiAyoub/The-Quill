@@ -408,7 +408,10 @@ function CheckInstruction($pgm): void{
             echo json_encode(array("action" => "LOGOUT"));
             break;
         case "DONE":
-            $_SESSION["etat_partie"]["jeu"]["etat_machine"]="description";
+            $_SESSION["etat_partie"]["jeu"]["etat_machine"]="tbl";
+            $_SESSION["etat_partie"]["jeu"]["table_en_cours"]="status";
+            $_SESSION["etat_partie"]["jeu"]["ligne_action"]=0;
+            $_SESSION["etat_partie"]["jeu"]["num_instruction"]=0;
             echo json_encode(array("action" => "NOP"));
             break;
         case "OK":

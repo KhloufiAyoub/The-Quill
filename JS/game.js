@@ -60,7 +60,7 @@ function affichage(str){
     var affichage = result["affichage"];
     var area = $("area");
     for(var i = 0; i < affichage.length; i++) {
-        area.value += affichage[i] + "\n\n";
+        area.value += affichage[i].replace(/<br>/g, "\n") + "\n\n";
     }
     area.scrollTop = area.scrollHeight;
     stateMachine();
