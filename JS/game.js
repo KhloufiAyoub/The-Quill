@@ -106,6 +106,7 @@ function endgame(){
 
 function action(str) {
     var result = JSON.parse(str);
+    console.log(result);
     var area = $("area");
     timeOutId = null;
     switch(result["action"]){
@@ -135,18 +136,12 @@ function action(str) {
             }
             break;
         case "LOGOUT":
-            logout()
-            break;
-        case "SAVE":
-            //fonction save
-            break;
-        case "LOAD":
-            loadGame();
+            logout();
             break;
         case "ANYKEY":
-            document.addEventListener("keydown", function handler(event) {
-            stateMachine();
-            document.removeEventListener("keydown", handler);
+            document.addEventListener("keydown", function handler() {
+                stateMachine();
+                document.removeEventListener("keydown", handler);
             });
             break;
     }
@@ -162,6 +157,7 @@ function logout(){
     }
     xhr.open("POST",url,true);
     xhr.setRequestHeader("Content-Type","application/x-www-form-urlencoded");
+    xhr.send();
 }
 
 function reset(){
@@ -190,7 +186,6 @@ function getCommand(){
     var xhr= new XMLHttpRequest();
     xhr.onreadystatechange = function(){
         if (xhr.readyState === 4 && xhr.status === 200){
-            console.log(xhr.responseText);
             action(xhr.responseText);
             gameInput.value = "";
         }
@@ -205,7 +200,6 @@ function stateMachine(){
     var xhr= new XMLHttpRequest();
     xhr.onreadystatechange = function(){
         if (xhr.readyState === 4 && xhr.status === 200){
-            console.log(xhr.responseText);
             action(xhr.responseText);
         }
     }

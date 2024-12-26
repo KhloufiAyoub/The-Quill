@@ -26,12 +26,11 @@ $_SESSION["etat_partie"] = array(
     "affichage" => [],
     "jeu" => array(
         "etat_machine" => "clear",
-        "mots_entres" => [],
         "table_en_cours" => "",
-        "entree_table" => "",
-        "ligne_action" => 0,
+        "entree_table" => [],
+        "regle" => 0,
         "num_instruction" => 0,
-        "nbr_tours" => 0,
+        "action_valide" => 0,
         "score" =>0
     )
 );

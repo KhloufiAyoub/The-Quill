@@ -16,45 +16,50 @@ switch ($_SESSION["etat_partie"]["jeu"]["etat_machine"]) {
         description();
         break;
     case "tbl":
-        //si on ne traite pas d'instruction, on essaye de lire la regle courante
+        $tbl = $_SESSION["etat_partie"]["jeu"]["table_en_cours"];
+        $tbl = $tbl =="action" ? 1 : 0;
+        $stm = $dbh->prepare("SELECT wid1, wid2, pgm FROM action WHERE tbl =? ORDER BY aid LIMIT 1 OFFSET ?");
+        $stm->execute(array($tbl,$_SESSION["etat_partie"]["jeu"]["regle"]));
+        //si on ne traite pas d'instruction
         if($_SESSION["etat_partie"]["jeu"]["num_instruction"]==0) {
-            $tbl = $_SESSION["etat_partie"]["jeu"]["table_en_cours"];
-            $tbl = $tbl =="action" ? 1 : 0;
-            $stm = $dbh->prepare("SELECT wid1, wid2, pgm FROM action WHERE tbl =? ORDER BY aid LIMIT 1 OFFSET ?");
-            $stm->execute(array($tbl,$_SESSION["etat_partie"]["jeu"]["ligne_action"]));
+            //on essaye de lire la regle courante
             if ($row = $stm->fetch()) {
+                //vérifie les conditions et les mots
                 if (CheckCondition($row["wid1"], $row["wid2"], $row["pgm"])) {
+                    if ($tbl == 1) {
+                        $_SESSION["etat_partie"]["jeu"]["action_valide"]++;
+                    }
+                    //on traite la premiere instruction
                     CheckInstruction($row["pgm"]);
-                } else {
+                } else {//si les conditions OU les mots ne sont pas valides
                     $_SESSION["etat_partie"]["jeu"]["num_instruction"]=0;
-                    $_SESSION["etat_partie"]["jeu"]["ligne_action"]++;
+                    $_SESSION["etat_partie"]["jeu"]["regle"]++;
                     echo json_encode(array("action" => "NOP"));
                 }
-            }else {
+            }else {//elle n'existe pas
                 if ($_SESSION["etat_partie"]["jeu"]["table_en_cours"] == "status") {
                     $_SESSION["etat_partie"]["jeu"]["etat_machine"] = "getCommandMessage";
                     echo json_encode(array("action" => "NOP"));
-                }else{
-                    if($_SESSION["etat_partie"]["jeu"]["entree_table"][0]<13){
-                        $stm=$dbh->prepare("SELECT message FROM smsg WHERE smid=7");
+                }else{//on est dans la table action
+                    //si aucune action n'a été validée
+                    if ($_SESSION["etat_partie"]["jeu"]["action_valide"]==0){
+                        if($_SESSION["etat_partie"]["jeu"]["entree_table"][0]<13){
+                            $stm=$dbh->prepare("SELECT message FROM smsg WHERE smid=7");
+                        }else{
+                            $stm=$dbh->prepare("SELECT message FROM smsg WHERE smid=8");
+                        }
+                        $stm->execute();
+                        $row=$stm->fetch();
+                        $_SESSION["etat_partie"]["affichage"][]=$row["message"];
+                        PrepareStatus();
+                        echo json_encode(array("action"=>"TEXT", "str"=>$row["message"]));
                     }else{
-                        $stm=$dbh->prepare("SELECT message FROM smsg WHERE smid=8");
+                        $_SESSION["etat_partie"]["jeu"]["etat_machine"]="getCommandMessage";
+                        echo json_encode(array("action"=>"NOP"));
                     }
-                    $stm->execute();
-                    $row=$stm->fetch();
-                    $_SESSION["etat_partie"]["affichage"][]=$row["message"];
-                    $_SESSION["etat_partie"]["jeu"]["etat_machine"]="tbl";
-                    $_SESSION["etat_partie"]["jeu"]["table_en_cours"]="status";
-                    $_SESSION["etat_partie"]["jeu"]["ligne_action"]=0;
-                    $_SESSION["etat_partie"]["jeu"]["num_instruction"]=0;
-                    echo json_encode(array("action"=>"TEXT", "str"=>$row["message"]));
                 }
             }
-        }else{
-            $tbl = $_SESSION["etat_partie"]["jeu"]["table_en_cours"];
-            $tbl = $tbl =="action" ? 1 : 0;
-            $stm = $dbh->prepare("SELECT wid1, wid2, pgm FROM action WHERE tbl =? ORDER BY aid LIMIT 1 OFFSET ?");
-            $stm->execute(array($tbl,$_SESSION["etat_partie"]["jeu"]["ligne_action"]));
+        }else{// on traitait les instructions
             $row = $stm->fetch();
             CheckInstruction($row["pgm"]);
         }
@@ -83,12 +88,13 @@ function description(): void{
     $_SESSION["etat_partie"]["flags"][2]--;
     if($_SESSION["etat_partie"]["flags"][2] < 0) $_SESSION["etat_partie"]["flags"][2] = 0;
 
+    //il fait noir.
     if($_SESSION["etat_partie"]["flags"][0] != 0){
-        //il fait noir.
         $_SESSION["etat_partie"]["flags"][3]--;
         if($_SESSION["etat_partie"]["flags"][3] < 0) $_SESSION["etat_partie"]["flags"][3] = 0;
-        if($_SESSION["etat_partie"]["positionObj"][0] == -1){
-            //obj 0 est absent
+
+        //obj 0 est absent
+        if($_SESSION["etat_partie"]["positionObj"][0] != -3 && $_SESSION["etat_partie"]["positionObj"][0] != $_SESSION["etat_partie"]["piece"]){
             $_SESSION["etat_partie"]["flags"][4]--;
             if($_SESSION["etat_partie"]["flags"][4] < 0) $_SESSION["etat_partie"]["flags"][4] = 0;
 
@@ -104,12 +110,7 @@ function description(): void{
         $row=$stm->fetch();
         $message = $row["roomdesc"];
 
-        $_SESSION["etat_partie"]["jeu"]["etat_machine"]="tbl";
-        $_SESSION["etat_partie"]["jeu"]["table_en_cours"]="status";
-        $_SESSION["etat_partie"]["jeu"]["ligne_action"]=0;
-        $_SESSION["etat_partie"]["jeu"]["num_instruction"]=0;
-
-        $_SESSION["etat_partie"]["affichage"][]=$message;
+        PrepareStatus();
 
         $objs=$_SESSION["etat_partie"]["positionObj"];
         $objNb=count($objs);
@@ -136,8 +137,17 @@ function description(): void{
 
             }
         }
+        $_SESSION["etat_partie"]["affichage"][]=$message;
         echo json_encode(array("action"=>"TEXT", "str"=>$message));
     }
+}
+
+function PrepareStatus(): void{
+    $_SESSION["etat_partie"]["jeu"]["etat_machine"] = "tbl";
+    $_SESSION["etat_partie"]["jeu"]["table_en_cours"] = "status";
+    $_SESSION["etat_partie"]["jeu"]["action_valide"] = 0;
+    $_SESSION["etat_partie"]["jeu"]["regle"] = 0;
+    $_SESSION["etat_partie"]["jeu"]["num_instruction"] = 0;
 }
 
 function decodeCommand(): void{
@@ -177,11 +187,13 @@ function decodeCommand(): void{
             if ($row=$stm->fetch()) {
                 $_SESSION["etat_partie"]["piece"]=$row["newroom"];
                 $_SESSION["etat_partie"]["jeu"]["etat_machine"]="clear";
-            }else{
+            }else{// un mouvement n'a pas pu être fait
+                //passe à l'état tbl en sélectionnant la table action
                 $_SESSION["etat_partie"]["jeu"]["etat_machine"]="tbl";
-                $_SESSION["etat_partie"]["jeu"]["ligne_action"] = 0;
+                $_SESSION["etat_partie"]["jeu"]["regle"] = 0;
                 $_SESSION["etat_partie"]["jeu"]["entree_table"] = $words;
                 $_SESSION["etat_partie"]["jeu"]["table_en_cours"] = "action";
+                $_SESSION["etat_partie"]["jeu"]["action_valide"]=0;
                 $_SESSION["etat_partie"]["jeu"]["num_instruction"] = 0;
 
                 if($_SESSION["etat_partie"]["flags"][5] != 0) $_SESSION["etat_partie"]["flags"][5]--;
@@ -190,6 +202,7 @@ function decodeCommand(): void{
                 if($_SESSION["etat_partie"]["flags"][8] != 0) $_SESSION["etat_partie"]["flags"][8]--;
                 if($_SESSION["etat_partie"]["flags"][9] != 0 && $_SESSION["etat_partie"]["flags"][0] != 0) $_SESSION["etat_partie"]["flags"][9]--;
                 if($_SESSION["etat_partie"]["flags"][10] != 0 && $_SESSION["etat_partie"]["flags"][0] != 0 && $_SESSION["etat_partie"]["positionObj"][0] == -1) $_SESSION["etat_partie"]["flags"][10]--;
+                //augmente le nombre de tours
                 $_SESSION["etat_partie"]["flags"][31]++;
             }
             echo json_encode(array("action"=>"NOP"));
@@ -202,8 +215,12 @@ function CheckCondition($wid1, $wid2, $pgm): bool{
         return false;
     }else{
         $pgm = unserialize($pgm);
-        for ($i = 0; $i < count($pgm["condition"]); $i++) {
-            $condition = $pgm["condition"][$i];
+        /*
+         * -1 : non créé (not created)
+         * -2 : porté (worn)
+         * -3 : transporté (dans l'inventaire) (carried)
+         */
+        foreach ($pgm["condition"] as $condition){
             switch ($condition["nom"]) {
                 case "TRUE":
                     break;
@@ -228,39 +245,38 @@ function CheckCondition($wid1, $wid2, $pgm): bool{
                     }
                     break;
                 case "PRESENT":
-                    $obj = $condition["param1"];
-                    for ($i = 0; $i < count($_SESSION["etat_partie"]["positionObj"]); $i++) {
-                        if ($_SESSION["etat_partie"]["positionObj"][$i]["wid"] == $obj) {
+                    $obj = (int)$condition["param1"];
+                    $objs=$_SESSION["etat_partie"]["positionObj"];
+                    $objNb=count($objs);
+                    for ($i = 0; $i <$objNb; $i++) {
+                        if ($objs[$i]["objid"] == $obj) {
                             $obj = $i;
-                            break;
                         }
                     }
-                    if($_SESSION["etat_partie"]["positionObj"][$obj]["pos"] != -2 &&
-                        $_SESSION["etat_partie"]["positionObj"][$obj]["pos"] != -3 &&
-                        $_SESSION["etat_partie"]["positionObj"][$obj]["pos"] != $_SESSION["etat_partie"]["piece"]){
+                    if($objs[$obj]["pos"] != -2 &&
+                        $objs[$obj]["pos"] != -3 &&
+                        $objs[$obj]["pos"] != $_SESSION["etat_partie"]["piece"]){
                         return false;
                     }
                     break;
                 case "ABSENT":
-                    $obj = $condition["param1"];
+                    $obj = (int)$condition["param1"];
                     for ($i = 0; $i < count($_SESSION["etat_partie"]["positionObj"]); $i++) {
-                        if ($_SESSION["etat_partie"]["positionObj"][$i]["wid"] == $obj) {
+                        if ($_SESSION["etat_partie"]["positionObj"][$i]["objid"] == $obj) {
                             $obj = $i;
-                            break;
                         }
                     }
                     if($_SESSION["etat_partie"]["positionObj"][$obj]["pos"] == -2 ||
-                        $_SESSION["etat_partie"]["positionObj"][$obj]["pos"] ==-3 ||
+                        $_SESSION["etat_partie"]["positionObj"][$obj]["pos"] == -3 ||
                         $_SESSION["etat_partie"]["positionObj"][$obj]["pos"] == $_SESSION["etat_partie"]["piece"]){
                         return false;
                     }
                     break;
                 case "WORN":
-                    $obj = $condition["param1"];
+                    $obj = (int)$condition["param1"];
                     for ($i = 0; $i < count($_SESSION["etat_partie"]["positionObj"]); $i++) {
-                        if ($_SESSION["etat_partie"]["positionObj"][$i]["wid"] == $obj) {
+                        if ($_SESSION["etat_partie"]["positionObj"][$i]["objid"] == $obj) {
                             $obj = $i;
-                            break;
                         }
                     }
                     if($_SESSION["etat_partie"]["positionObj"][$obj]["pos"] != -2){
@@ -268,11 +284,10 @@ function CheckCondition($wid1, $wid2, $pgm): bool{
                     }
                     break;
                 case "NOTWORN":
-                    $obj = $condition["param1"];
+                    $obj = (int)$condition["param1"];
                     for ($i = 0; $i < count($_SESSION["etat_partie"]["positionObj"]); $i++) {
-                        if ($_SESSION["etat_partie"]["positionObj"][$i]["wid"] == $obj) {
+                        if ($_SESSION["etat_partie"]["positionObj"][$i]["objid"] == $obj) {
                             $obj = $i;
-                            break;
                         }
                     }
                     if($_SESSION["etat_partie"]["positionObj"][$obj]["pos"] == -2){
@@ -280,11 +295,10 @@ function CheckCondition($wid1, $wid2, $pgm): bool{
                     }
                     break;
                 case "CARRIED":
-                    $obj = $condition["param1"];
+                    $obj = (int)$condition["param1"];
                     for ($i = 0; $i < count($_SESSION["etat_partie"]["positionObj"]); $i++) {
-                        if ($_SESSION["etat_partie"]["positionObj"][$i]["wid"] == $obj) {
+                        if ($_SESSION["etat_partie"]["positionObj"][$i]["objid"] == $obj) {
                             $obj = $i;
-                            break;
                         }
                     }
                     if ($_SESSION["etat_partie"]["positionObj"][$obj]["pos"] != -3){
@@ -292,11 +306,10 @@ function CheckCondition($wid1, $wid2, $pgm): bool{
                     }
                     break;
                 case "NOTCARR":
-                    $obj = $condition["param1"];
+                    $obj = (int)$condition["param1"];
                     for ($i = 0; $i < count($_SESSION["etat_partie"]["positionObj"]); $i++) {
-                        if ($_SESSION["etat_partie"]["positionObj"][$i]["wid"] == $obj) {
+                        if ($_SESSION["etat_partie"]["positionObj"][$i]["objid"] == $obj) {
                             $obj = $i;
-                            break;
                         }
                     }
                     if ($_SESSION["etat_partie"]["positionObj"][$obj]["pos"] == -3){
@@ -344,14 +357,14 @@ function CheckInstruction($pgm): void{
     $pgm = unserialize($pgm);
 
     $num_instruction = $_SESSION["etat_partie"]["jeu"]["num_instruction"];
+    // si on arrive à la dernière instruction
     if ($pgm["instruction"][$num_instruction] == null) {
         $_SESSION["etat_partie"]["jeu"]["num_instruction"]=0;
-        $_SESSION["etat_partie"]["jeu"]["ligne_action"]++;
+        $_SESSION["etat_partie"]["jeu"]["regle"]++;
         echo json_encode(array("action" => "NOP"));
         return;
     }
     $instruction = $pgm["instruction"][$num_instruction];
-
     switch ($instruction["nom"]) {
         case "NOP":
             echo json_encode(array("action" => "NOP"));
@@ -367,7 +380,7 @@ function CheckInstruction($pgm): void{
             $stm2=$dbh->prepare("SELECT message FROM smsg WHERE smid=10");
             $stm2->execute();
             $row2=$stm2->fetch();
-            
+
             $cpt=0;
             while($row=$stm->fetch()) {
                 if ($_SESSION["etat_partie"]["positionObj"][$row["objid"]]["pos"] == -2) {
@@ -408,28 +421,34 @@ function CheckInstruction($pgm): void{
             echo json_encode(array("action" => "LOGOUT"));
             break;
         case "DONE":
-            $_SESSION["etat_partie"]["jeu"]["etat_machine"]="tbl";
-            $_SESSION["etat_partie"]["jeu"]["table_en_cours"]="status";
-            $_SESSION["etat_partie"]["jeu"]["ligne_action"]=0;
-            $_SESSION["etat_partie"]["jeu"]["num_instruction"]=0;
+            Done();
             echo json_encode(array("action" => "NOP"));
-            break;
+            return;
         case "OK":
             $stm=$dbh->prepare("SELECT message FROM smsg WHERE smid=15");
             $stm->execute();
             $row=$stm->fetch();
-            $_SESSION["etat_partie"]["jeu"]["etat_machine"]="getCommand";
             $_SESSION["etat_partie"]["affichage"][]=$row["message"];
+            Done();
             echo json_encode(array("action" => "TEXT", "str" => $row["message"]));
-            break;
+            return;
         case "ANYKEY":
             echo json_encode(array("action" => "ANYKEY"));
             break;
         case "SAVE":
-            echo json_encode(array("action" => "SAVE"));
+            $uid=$_SESSION["uid"];
+            $saveData=serialize($_SESSION["etat_partie"]);
+            $stm=$dbh->prepare("UPDATE usr SET autosave=? WHERE uid=?");
+            $stm->execute(array($saveData, $uid));
+            echo json_encode(array("action" => "NOP"));
             break;
         case "LOAD":
-            echo json_encode(array("action" => "LOAD"));
+            $uid=$_SESSION["uid"];
+            $stm=$dbh->prepare("SELECT autosave FROM usr WHERE uid=?");
+            $stm->execute(array($uid));
+            $row=$stm->fetch();
+            $_SESSION["etat_partie"]=unserialize($row["autosave"]);
+            echo json_encode(array("action" => "NOP"));
             break;
         case "TURNS":
             $message = "";
@@ -437,12 +456,14 @@ function CheckInstruction($pgm): void{
             $stm->execute();
             $row = $stm->fetch();
             $message .= $row["message"];
+
+            $message .= " " . $_SESSION["etat_partie"]["flags"][31] . " ";
             $stm=$dbh->prepare("SELECT message FROM smsg WHERE smid=18");
             $stm->execute();
             $row= $stm->fetch();
             $message .= $row["message"];
 
-            if($_SESSION["etat_partie"]["jeu"]["nbr_tours"]>1){
+            if($_SESSION["etat_partie"]["flags"][31]>1){
                 $stm=$dbh->prepare("SELECT message FROM smsg WHERE smid=19");
                 $stm->execute();
                 $row= $stm->fetch();
@@ -453,7 +474,7 @@ function CheckInstruction($pgm): void{
             $row= $stm->fetch();
             $message .= $row["message"];
             $_SESSION["etat_partie"]["affichage"][]=$message;
-            echo json_encode(array("TEXT" => $message));
+            echo json_encode(array("action" => "TEXT", "str" => $message));
             break;
         case "SCORE":
             $stm=$dbh->prepare("SELECT message FROM smsg WHERE smid=21");
@@ -489,16 +510,16 @@ function CheckInstruction($pgm): void{
         case "AUTOREM":
         case "REMOVE":
             if ($instruction["nom"] == "AUTOREM"){
-                $obj = $_SESSION["etat_partie"]["jeu"]["entree_table"][1];
+                $obj = CheckValidObj();
+                if ($obj==null){
+                    return;
+                }
             }else{
                 $obj = $instruction["param1"];
             }
-            for ($i = 0; $i < count($_SESSION["etat_partie"]["positionObj"]); $i++) {
-                if ($_SESSION["etat_partie"]["positionObj"][$i]["wid"] == $obj) {
-                    $obj = $i;
-                    break;
-                }
-            }
+            $obj = GetObjPos($obj);
+            if ($obj==null) return;
+
             $stm = $dbh->prepare("SELECT value FROM params WHERE param=?");
             $stm->execute(array("maxobj"));
             $row = $stm->fetch();
@@ -507,17 +528,21 @@ function CheckInstruction($pgm): void{
                 $stm = $dbh->prepare("SELECT message FROM smsg WHERE smid=23");
                 $stm->execute();
                 $row = $stm->fetch();
-                $_SESSION["etat_partie"]["jeu"]["etat_machine"] = "getCommand";
                 $_SESSION["etat_partie"]["affichage"][]=$row["message"];
+                Done();
                 echo json_encode(array("action" => "TEXT", "str" => $row["message"]));
-            }elseif ($maxObj == $_SESSION["etat_partie"]["flags"][1]) {
+                return;
+            }
+            elseif ($maxObj == $_SESSION["etat_partie"]["flags"][1]) {
                 $stm = $dbh->prepare("SELECT message FROM smsg WHERE smid=24");
                 $stm->execute();
                 $row = $stm->fetch();
-                $_SESSION["etat_partie"]["jeu"]["etat_machine"] = "getCommand";
+                Done();
                 $_SESSION["etat_partie"]["affichage"][]=$row["message"];
                 echo json_encode(array("action" => "TEXT", "str" => $row["message"]));
-            }else{
+                return;
+            }
+            else{
                 $_SESSION["etat_partie"]["positionObj"][$obj]["pos"] = -3;
                 $_SESSION["etat_partie"]["flags"][1]++;
                 if ($_SESSION["etat_partie"]["flags"][1] > 255) $_SESSION["etat_partie"]["flags"][1] = 255;
@@ -527,17 +552,16 @@ function CheckInstruction($pgm): void{
         case "AUTOGET":
         case "GET":
             if ($instruction["nom"] == "AUTOGET"){
-                $obj = $_SESSION["etat_partie"]["jeu"]["entree_table"][1];
+                $obj = CheckValidObj();
+                if ($obj==null){
+                    return;
+                }
             }else{
                 $obj = $instruction["param1"];
             }
 
-            for ($i = 0; $i < count($_SESSION["etat_partie"]["positionObj"]); $i++) {
-                if ($_SESSION["etat_partie"]["positionObj"][$i]["wid"] == $obj) {
-                    $obj = $i;
-                    break;
-                }
-            }
+            $obj = GetObjPos($obj);
+            if ($obj==null) return;
             $stm = $dbh->prepare("SELECT value FROM params WHERE param=?");
             $stm->execute(array("maxobj"));
             $row = $stm->fetch();
@@ -547,23 +571,26 @@ function CheckInstruction($pgm): void{
                 $stm = $dbh->prepare("SELECT message FROM smsg WHERE smid=25");
                 $stm->execute();
                 $row = $stm->fetch();
-                $_SESSION["etat_partie"]["jeu"]["etat_machine"] = "getCommand";
+                Done();
                 $_SESSION["etat_partie"]["affichage"][]=$row["message"];
                 echo json_encode(array("action" => "TEXT", "str" => $row["message"]));
+                return;
             }elseif ($_SESSION["etat_partie"]["positionObj"][$obj]["pos"] != $_SESSION["etat_partie"]["piece"]) {
                 $stm = $dbh->prepare("SELECT message FROM smsg WHERE smid=26");
                 $stm->execute();
                 $row = $stm->fetch();
-                $_SESSION["etat_partie"]["jeu"]["etat_machine"] = "getCommand";
+                Done();
                 $_SESSION["etat_partie"]["affichage"][]=$row["message"];
                 echo json_encode(array("action" => "TEXT", "str" => $row["message"]));
+                return;
             }elseif ($_SESSION["etat_partie"]["flags"][1] == $maxObj) {
                 $stm = $dbh->prepare("SELECT message FROM smsg WHERE smid=27");
                 $stm->execute();
                 $row = $stm->fetch();
-                $_SESSION["etat_partie"]["jeu"]["etat_machine"] = "getCommand";
+                Done();
                 $_SESSION["etat_partie"]["affichage"][]=$row["message"];
                 echo json_encode(array("action" => "TEXT", "str" => $row["message"]));
+                return;
             }else{
                 $_SESSION["etat_partie"]["positionObj"][$obj]["pos"] = -3;
                 $_SESSION["etat_partie"]["flags"][1]++;
@@ -574,30 +601,31 @@ function CheckInstruction($pgm): void{
         case "AUTOWEAR":
         case "WEAR":
             if ($instruction["nom"] == "AUTOWEAR"){
-                $obj = $_SESSION["etat_partie"]["jeu"]["entree_table"][1];
+                $obj = CheckValidObj();
+                if ($obj==null){
+                    return;
+                }
             }else{
                 $obj = $instruction["param1"];
             }
-            for ($i = 0; $i < count($_SESSION["etat_partie"]["positionObj"]); $i++) {
-                if ($_SESSION["etat_partie"]["positionObj"][$i]["wid"] == $obj) {
-                    $obj = $i;
-                    break;
-                }
-            }
+            $obj = GetObjPos($obj);
+            if ($obj==null) return;
             if ($_SESSION["etat_partie"]["positionObj"][$obj]["pos"] == -2) {
                 $stm = $dbh->prepare("SELECT message FROM smsg WHERE smid=29");
                 $stm->execute();
                 $row = $stm->fetch();
-                $_SESSION["etat_partie"]["jeu"]["etat_machine"]="getCommand";
+                Done();
                 $_SESSION["etat_partie"]["affichage"][]=$row["message"];
                 echo json_encode(array("action" => "TEXT", "str" => $row["message"]));
+                return;
             }elseif ($_SESSION["etat_partie"]["positionObj"][$obj]["pos"] != -3){
                 $stm = $dbh->prepare("SELECT message FROM smsg WHERE smid=28");
                 $stm->execute();
                 $row = $stm->fetch();
-                $_SESSION["etat_partie"]["jeu"]["etat_machine"] = "getCommand";
+                Done();
                 $_SESSION["etat_partie"]["affichage"][]=$row["message"];
                 echo json_encode(array("action" => "TEXT", "str" => $row["message"]));
+                return;
             }else{
                 $_SESSION["etat_partie"]["positionObj"][$obj]["pos"] = -2;
                 $_SESSION["etat_partie"]["flags"][1]++;
@@ -608,16 +636,15 @@ function CheckInstruction($pgm): void{
         case "AUTODROP":
         case "DROP":
             if ($instruction["nom"] == "AUTODROP"){
-                $obj = $_SESSION["etat_partie"]["jeu"]["entree_table"][1];
+                $obj = CheckValidObj();
+                if ($obj==null){
+                    return;
+                }
             }else{
                 $obj = $instruction["param1"];
             }
-            for ($i = 0; $i < count($_SESSION["etat_partie"]["positionObj"]); $i++) {
-                if ($_SESSION["etat_partie"]["positionObj"][$i]["wid"] == $obj) {
-                    $obj = $i;
-                    break;
-                }
-            }
+            $obj = GetObjPos($obj);
+            if ($obj==null) return;
             if ($_SESSION["etat_partie"]["positionObj"][$obj]["pos"] == -2){
                 $stm = $dbh->prepare("SELECT value FROM params WHERE param=?");
                 $stm->execute(array("maxobj"));
@@ -627,9 +654,10 @@ function CheckInstruction($pgm): void{
                     $stm = $dbh->prepare("SELECT message FROM smsg WHERE smid=24");
                     $stm->execute();
                     $row = $stm->fetch();
-                    $_SESSION["etat_partie"]["jeu"]["etat_machine"]="getCommand";
+                    Done();
                     $_SESSION["etat_partie"]["affichage"][]=$row["message"];
                     echo json_encode(array("action" => "TEXT", "str" => $row["message"]));
+                    return;
                 }else{
                     echo json_encode(array("action" => "NOP"));
                 }
@@ -638,9 +666,10 @@ function CheckInstruction($pgm): void{
                     $stm = $dbh->prepare("SELECT message FROM smsg WHERE smid=28");
                     $stm->execute();
                     $row = $stm->fetch();
-                    $_SESSION["etat_partie"]["jeu"]["etat_machine"]="getCommand";
+                    Done();
                     $_SESSION["etat_partie"]["affichage"][]=$row["message"];
                     echo json_encode(array("action" => "TEXT", "str" => $row["message"]));
+                    return;
                 }else{
                     $_SESSION["etat_partie"]["positionObj"][$obj]["pos"] = $_SESSION["etat_partie"]["piece"];
                     $_SESSION["etat_partie"]["flags"][1]--;
@@ -651,12 +680,8 @@ function CheckInstruction($pgm): void{
             break;
         case "CREATE":
             $obj = (int)$instruction["param1"];
-            for ($i = 0; $i < count($_SESSION["etat_partie"]["positionObj"]); $i++) {
-                if ($_SESSION["etat_partie"]["positionObj"][$i]["wid"] == $obj) {
-                    $obj = $i;
-                    break;
-                }
-            }
+            $obj = GetObjPos($obj);
+            if ($obj==null) return;
             if ($_SESSION["etat_partie"]["positionObj"][$obj]["pos"] == -3) {
                 $_SESSION["etat_partie"]["flags"][1]--;
                 if ($_SESSION["etat_partie"]["flags"][1] < 0) $_SESSION["etat_partie"]["flags"][1] = 0;
@@ -665,13 +690,9 @@ function CheckInstruction($pgm): void{
             echo json_encode(array("action" => "NOP"));
             break;
         case "DESTROY":
-            $obj = $instruction["param1"];
-            for ($i = 0; $i < count($_SESSION["etat_partie"]["positionObj"]); $i++) {
-                if ($_SESSION["etat_partie"]["positionObj"][$i]["wid"] == $obj) {
-                    $obj = $i;
-                    break;
-                }
-            }
+            $obj = (int)$instruction["param1"];
+            $obj = GetObjPos($obj);
+            if ($obj==null) return;
             if ($_SESSION["etat_partie"]["positionObj"][$obj]["pos"] == -3) {
                 $_SESSION["etat_partie"]["flags"][1]--;
                 if ($_SESSION["etat_partie"]["flags"][1] < 0) $_SESSION["etat_partie"]["flags"][1] = 0;
@@ -681,12 +702,8 @@ function CheckInstruction($pgm): void{
             break;
         case "PLACE":
             $obj = $instruction["param1"];
-            for ($i = 0; $i < count($_SESSION["etat_partie"]["positionObj"]); $i++) {
-                if ($_SESSION["etat_partie"]["positionObj"][$i]["wid"] == $obj) {
-                    $obj = $i;
-                    break;
-                }
-            }
+            $obj = GetObjPos($obj);
+            if ($obj==null) return;
             if ($_SESSION["etat_partie"]["positionObj"][$obj]["pos"] == -3) {
                 $_SESSION["etat_partie"]["flags"][1]--;
                 if ($_SESSION["etat_partie"]["flags"][1] < 0) $_SESSION["etat_partie"]["flags"][1] = 0;
@@ -699,10 +716,10 @@ function CheckInstruction($pgm): void{
             $obj2 = $instruction["param2"];
             $cpt = 0;
             for ($i = 0; $i < count($_SESSION["etat_partie"]["positionObj"]); $i++) {
-                if ($_SESSION["etat_partie"]["positionObj"][$i]["wid"] == $obj1) {
+                if ($_SESSION["etat_partie"]["positionObj"][$i]["objid"] == $obj1) {
                     $obj1 = $i;
                     $cpt++;
-                }elseif ($_SESSION["etat_partie"]["positionObj"][$i]["wid"] == $obj2) {
+                }elseif ($_SESSION["etat_partie"]["positionObj"][$i]["objid"] == $obj2) {
                     $obj2 = $i;
                     $cpt++;
                 }
@@ -749,4 +766,41 @@ function CheckInstruction($pgm): void{
             break;
     }
     $_SESSION["etat_partie"]["jeu"]["num_instruction"]++;
+}
+
+
+function Done(): void{
+    $_SESSION["etat_partie"]["jeu"]["etat_machine"] = "tbl";
+    $tblEnCours = $_SESSION["etat_partie"]["jeu"]["table_en_cours"];
+    $_SESSION["etat_partie"]["jeu"]["table_en_cours"] = "status" == $tblEnCours ? "action" : "status";
+    $_SESSION["etat_partie"]["jeu"]["regle"] = 0;
+    $_SESSION["etat_partie"]["jeu"]["num_instruction"] = 0;
+    $_SESSION["etat_partie"]["jeu"]["action_valide"] = 0;
+}
+
+function CheckValidObj(): ?int{
+    global $dbh;
+    $obj = $_SESSION["etat_partie"]["jeu"]["entree_table"][1];
+    $stm=$dbh->prepare("SELECT objid  FROM obj WHERE wid=?");
+    $stm->execute(array($obj));
+    if($row = $stm->fetch()){
+        return $row["objid"];
+    }else{
+        $stm=$dbh->prepare("SELECT message FROM smsg WHERE smid=8");
+        $stm->execute();
+        $row=$stm->fetch();
+        $_SESSION["etat_partie"]["affichage"][]=$row["message"];
+        Done();
+        echo json_encode(array("action"=>"TEXT", "str"=>$row["message"]));
+        return null;
+    }
+}
+
+function GetObjPos($obj):?int{
+    for ($i = 0; $i < count($_SESSION["etat_partie"]["positionObj"]); $i++) {
+        if ($_SESSION["etat_partie"]["positionObj"][$i]["objid"] == $obj) {
+            return $i;
+        }
+    }
+    return null;
 }
