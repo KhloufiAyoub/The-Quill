@@ -143,6 +143,10 @@ function action(str) {
                 stateMachine();
                 document.removeEventListener("keydown", handler);
             });
+            document.addEventListener("touchstart", function handler() {
+                stateMachine();
+                document.removeEventListener("touchstart", handler);
+            });
             break;
         case "YESNO":
             area.value += result["str"].replace(/<br>/g, "\n") + "\n\n";
