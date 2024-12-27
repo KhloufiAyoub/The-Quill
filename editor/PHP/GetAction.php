@@ -9,7 +9,7 @@ $a =array("action"=>[], "obj"=>[], "room"=>[], "msg"=>[], "vocab"=>[]);
 $stm = $dbh->prepare("SELECT aid, tbl, wid1, wid2, pgm FROM action WHERE aid<>-1 ORDER BY tbl,wid1, wid2, aid"); //trier sur ordre de creation
 $stm->execute();
 while ($row=$stm->fetch()){
-    $value=array("aid"=>$row["aid"], "tbl"=>$row["tbl"], "wid1"=>$row["wid1"], "wid2"=>$row["wid2"], "pgm"=>json_encode(unserialize($row["pgm"])));
+    $value=array("aid"=>$row["aid"], "Table"=>$row["tbl"], "Mot 1"=>$row["wid1"], "Mot 2"=>$row["wid2"], "Programme"=>json_encode(unserialize($row["pgm"])));
     $a["action"][]=$value;
 }
 
@@ -25,7 +25,7 @@ while ($row=$stm->fetch()){
 $stm=$dbh->prepare("SELECT rid, roomdesc FROM location ORDER BY rid");
 $stm->execute();
 while ($row=$stm->fetch()){
-    $value=array("rid"=>$row["rid"], "roomdesc"=>$row["roomdesc"]);
+    $value=array("ID de la pièce"=>$row["rid"], "Description de la pièce"=>$row["roomdesc"]);
     $a["room"][]=$value;
 }
 

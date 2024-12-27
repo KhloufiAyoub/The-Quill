@@ -9,7 +9,7 @@ $stm=$dbh->prepare("SELECT rid, roomdesc FROM location ORDER BY rid");
 $stm->execute();
 
 while ($row=$stm->fetch()){
-    $value=array("rid"=>$row["rid"], "roomdesc"=>$row["roomdesc"]);
+    $value=array("ID de la pièce"=>$row["rid"], "Description de la pièce"=>$row["roomdesc"]);
     $a[]=$value;
 }
 

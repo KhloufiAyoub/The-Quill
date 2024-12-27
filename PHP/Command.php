@@ -717,7 +717,7 @@ function CheckInstruction($pgm): void{
             }else{
                 $_SESSION["etat_partie"]["positionObj"][$obj]["pos"] = -3;
                 $_SESSION["etat_partie"]["flags"][1]++;
-                if ($_SESSION["etat_partie"]["flags"][1] > 255) $_SESSION["etat_partie"]["flags"][1] = 255;
+                if ($_SESSION["etat_partie"]["flags"][1] > 255) $_SESSION["etat_partie"]["flags"][1] = 0;
                 echo json_encode(array("action" => "NOP"));
             }
             break;

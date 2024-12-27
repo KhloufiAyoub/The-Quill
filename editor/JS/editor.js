@@ -67,7 +67,10 @@ function init(){
     $("ObjButton").onclick = ShowObjectForm;
     hide("ObjButton")
     $("MoveButton").onclick = ShowMoveForm;
+    hide("MoveButton")
     $("VocabButton").onclick = ShowVocabForm;
+    hide("VocabButton")
+    hide("ActionButton")
 
     $("RoomSubmit").onclick = AddRoom;
     $("RoomCancel").onclick = function () {hide("AddRoom");};
@@ -659,22 +662,46 @@ function Get(url, elements,table, promptvalue= null, isDeletable=true, isEditabl
 
 function GetRoom(){
     var url="PHP/GetRoom.php";
-    Get(url,["rid","roomdesc"], "Piece","Nouvelle description de la pièce :" ,true,true);
+    show("RoomButton");
+    hide("ActionButton");
+    hide("MsgButton");
+    hide("ObjButton");
+    hide("MoveButton");
+    hide("VocabButton")
+    Get(url,["ID de la pièce","Description de la pièce"], "Piece","Nouvelle description de la pièce :" ,true,true);
 }
 
 function GetMessage(){
     var url="PHP/GetMessage.php";
-    Get(url,["mid","message"],"Message", "Nouveau message :",true,true);
+    show("MsgButton");
+    hide("VocabButton")
+    hide("ObjButton")
+    hide("RoomButton")
+    hide("MoveButton")
+    hide("ActionButton")
+    Get(url,["ID du message","Message"],"Message", "Nouveau message :",true,true);
 }
 
 function GetSmsg(){
     var url="PHP/GetSmsg.php";
-    Get(url,["smid","message"], "SMessage",null,false, false)
+    hide("ActionButton");
+    hide("RoomButton");
+    hide("MsgButton");
+    hide("ObjButton");
+    hide("MoveButton");
+    hide("VocabButton")
+    Get(url,["ID du message système","Message système"], "SMessage",null,false, false)
 }
 
 function GetMove(){
     var url="PHP/GetMove.php";
-    Get(url,["rid","word", "newroom"],"Deplacement",null , true,false)
+    show("MoveButton");
+    hide("ActionButton");
+    hide("RoomButton");
+    hide("MsgButton");
+    hide("ObjButton");
+    hide("VocabButton")
+    Get(url,["ID du déplacement","Mot", "Nouvelle pièce"],"Deplacement",null , true,false)
 }
 
 function GetVocab(){
@@ -693,7 +720,7 @@ function GetAction(){
     var xhr= new XMLHttpRequest();
     xhr.onreadystatechange = function(){
         if (xhr.readyState === 4 && xhr.status === 200){
-            ProcessRequest(xhr.responseText, ["tbl","wid1", "wid2", "pgm"],"Action", null, true, true, "action");
+            ProcessRequest(xhr.responseText, ["Table","Mot 1", "Mot 2", "Programme"],"Action", null, true, true, "action");
             show("ActionButton");
             hide("RoomButton");
             hide("MsgButton");

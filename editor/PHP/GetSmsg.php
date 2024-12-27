@@ -9,7 +9,7 @@ $stm=$dbh->prepare("SELECT smid,message FROM smsg ORDER BY smid");
 $stm->execute();
 
 while ($row=$stm->fetch()){
-    $value=array("smid"=>$row["smid"], "message"=>$row["message"]);
+    $value=array("ID du message système"=>$row["smid"], "Message système"=>$row["message"]);
     $a[]=$value;
 }
 

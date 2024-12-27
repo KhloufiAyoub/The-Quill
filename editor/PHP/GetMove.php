@@ -12,7 +12,7 @@ while ($row=$stm->fetch()){
     $stm2=$dbh->prepare("SELECT word FROM vocab WHERE wid=?");
     $stm2->execute(array($row["wid"]));
     if($row2=$stm2->fetch()){
-        $value=array("rid"=>$row["rid"], "word"=>$row2["word"], "newroom"=>$row["newroom"]);
+        $value=array("ID du déplacement"=>$row["rid"], "Mot"=>$row2["word"], "Nouvelle pièce"=>$row["newroom"]);
         $a[]=$value;
     }
 }

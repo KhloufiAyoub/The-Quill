@@ -104,10 +104,24 @@
         <div id="vocab">
             <div id="AddVocab">
                 <h2>Éditeur de mots</h2>
-                <input type="number" id="VocabNum" placeholder="wid" /><br>
-                <input type="text" id="VocabValue" placeholder="word" /><br>
-                <input type="submit" id="VocabSubmit" value="Ajouter">
-                <input type="button" id="VocabCancel" value="Annuler">
+                <input type="number" id="VocabNum" placeholder="ID du mot" /><br>
+                <input type="text" id="VocabValue" placeholder="Mot" /><br>
+                <button id="VocabSubmit" class="submit-btn">
+                    <span class="circle1"></span>
+                    <span class="circle2"></span>
+                    <span class="circle3"></span>
+                    <span class="circle4"></span>
+                    <span class="circle5"></span>
+                    <span class="text">Ajouter</span>
+                </button>
+                <button id="VocabCancel" class="submit-btn">
+                    <span class="circle1"></span>
+                    <span class="circle2"></span>
+                    <span class="circle3"></span>
+                    <span class="circle4"></span>
+                    <span class="circle5"></span>
+                    <span class="text">Annuler</span>
+                </button>
             </div>
         </div>
 
@@ -215,7 +229,14 @@
         <div id="word">
             <p id="wordSize_p"></p>
             <input type="number" id="wordSize">
-            <input type="submit" id="submitWord" value="Modifier">
+            <button id="submitWord" class="submit-btn">
+                <span class="circle1"></span>
+                <span class="circle2"></span>
+                <span class="circle3"></span>
+                <span class="circle4"></span>
+                <span class="circle5"></span>
+                <span class="text">Modifier</span>
+            </button>
         </div>
         <div id="mobj">
             <p id="maxObj_p"></p>

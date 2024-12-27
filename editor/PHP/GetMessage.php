@@ -9,7 +9,7 @@ $stm=$dbh->prepare("SELECT mid, message FROM msg ORDER BY mid");
 $stm->execute();
 
 while ($row=$stm->fetch()){
-    $value=array("mid"=>$row["mid"], "message"=>$row["message"]);
+    $value=array("ID du message"=>$row["mid"], "Message"=>$row["message"]);
     $a[]=$value;
 }
 

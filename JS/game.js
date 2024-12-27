@@ -139,6 +139,7 @@ function action(str) {
             logout();
             break;
         case "ANYKEY":
+            area.value += result["str"].replace(/<br>/g, "\n") + "\n\n";
             document.addEventListener("keydown", function handler() {
                 stateMachine();
                 document.removeEventListener("keydown", handler);
