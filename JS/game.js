@@ -106,7 +106,6 @@ function endgame(){
 
 function action(str) {
     var result = JSON.parse(str);
-    console.log(result);
     var area = $("area");
     timeOutId = null;
     switch(result["action"]){
@@ -201,7 +200,6 @@ function getCommand(){
     xhr.onreadystatechange = function(){
         if (xhr.readyState === 4 && xhr.status === 200){
             action(xhr.responseText);
-            console.log(JSON.parse(xhr.responseText));
             gameInput.value = "";
         }
     }
@@ -215,7 +213,6 @@ function stateMachine(){
     var xhr= new XMLHttpRequest();
     xhr.onreadystatechange = function(){
         if (xhr.readyState === 4 && xhr.status === 200){
-            console.log(JSON.parse(xhr.responseText));
             action(xhr.responseText);
         }
     }
@@ -225,7 +222,6 @@ function stateMachine(){
 }
 
 function startSession() {
-    console.log("Session Start");
     var url = "PHP/SessionStart.php";
     var xhr = new XMLHttpRequest();
     xhr.open("GET", url, true);
