@@ -201,7 +201,7 @@ function getCommand(){
     xhr.onreadystatechange = function(){
         if (xhr.readyState === 4 && xhr.status === 200){
             action(xhr.responseText);
-            console.log(xhr.responseText);
+            console.log(JSON.parse(xhr.responseText));
             gameInput.value = "";
         }
     }
@@ -215,7 +215,7 @@ function stateMachine(){
     var xhr= new XMLHttpRequest();
     xhr.onreadystatechange = function(){
         if (xhr.readyState === 4 && xhr.status === 200){
-            console.log(xhr.responseText)
+            console.log(JSON.parse(xhr.responseText));
             action(xhr.responseText);
         }
     }

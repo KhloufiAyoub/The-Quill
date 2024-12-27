@@ -108,7 +108,7 @@ switch ($_SESSION["etat_partie"]["jeu"]["etat_machine"]) {
         $uid=$_SESSION["uid"];
         $slot=$_SESSION["etat_partie"]["jeu"]["entree_table"][1];
         $slotsUsed = $_SESSION["etat_partie"]["slotsUsed"];
-        if(in_array($slot,$slotsUsed)){
+        if($slot>=1 && $slot<=5 && in_array($slot, $slotsUsed)){
             $stm=$dbh->prepare("SELECT savedata FROM savegame WHERE uid=? AND slot=?");
             $stm->execute(array($uid, $slot));
             $row=$stm->fetch();
@@ -127,7 +127,6 @@ switch ($_SESSION["etat_partie"]["jeu"]["etat_machine"]) {
                 Done();
                 echo json_encode(array("action"=>"TEXT", "str"=>"No saved game ! :("));
             }
-
         }else{
             Done();
             echo json_encode(array("action"=>"TEXT", "str"=>"No saved game in slot ". $slot . " ! :("));
@@ -137,14 +136,9 @@ switch ($_SESSION["etat_partie"]["jeu"]["etat_machine"]) {
         $uid=$_SESSION["uid"];
         $slot=$_SESSION["etat_partie"]["jeu"]["entree_table"][1];
 
-        $stm = $dbh->prepare("SELECT slot FROM savegame WHERE uid=? AND savedata IS NULL");
-        $stm->execute(array($uid));
-        $slots = [];
-        while ($row = $stm->fetch()) {
-            $slots[] = $row["slot"];
-        }
+        $slots = $_SESSION["etat_partie"]["slotsUsed"];
         
-        if(in_array($slot, $slots)){
+        if( $slot>=1 && $slot<=5 && !in_array($slot, $slots)){
             $_SESSION["etat_partie"]["slotsUsed"][] = $slot;
             $_SESSION["etat_partie"]["affichage"][]="Game saved in slot ". $slot . " ! :)";
             $saveData=serialize($_SESSION["etat_partie"]);
@@ -156,12 +150,14 @@ switch ($_SESSION["etat_partie"]["jeu"]["etat_machine"]) {
 
             $stm=$dbh->prepare("UPDATE usr SET autosave=? WHERE uid=?");
             $stm->execute(array($saveData, $uid));
+            
+            $slotsUnused = array_diff([1,2,3,4,5], $slots);
 
-            unset($slots[array_search($slot, $slots)]);
-            $slots = array_values($slots);
+            unset($slotsUnused[array_search($slot, $slotsUnused)]);
+            $slotsUnused = array_values($slotsUnused);
 
             Done();
-            echo json_encode(array("action" => "SAVESLOT", "str" => "Game saved in slot ". $slot . " ! :)", "slots" => $slots));
+            echo json_encode(array("action" => "SAVESLOT", "str" => "Game saved in slot ". $slot . " ! :)", "slots" => $slotsUnused));
         }elseif ($slot == null){
             $_SESSION["etat_partie"]["affichage"][]="Game saved ! :)";
             $saveData=serialize($_SESSION["etat_partie"]);
