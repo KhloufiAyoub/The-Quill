@@ -18,12 +18,12 @@ if($row=$stm->fetch()){
     $flags[1]=$row["COUNT(objid)"];
 }
 
-
 $_SESSION["etat_partie"] = array(
     "flags" => $flags,
     "positionObj" => $positionObj,
     "piece" =>0,
     "affichage" => [],
+    "slotsUsed"=>[],
     "jeu" => array(
         "etat_machine" => "clear",
         "table_en_cours" => "",

@@ -23,6 +23,7 @@ switch ($_SESSION["etat_partie"]["jeu"]["etat_machine"]) {
         //si on ne traite pas d'instruction
         if($_SESSION["etat_partie"]["jeu"]["num_instruction"]==0) {
             //on essaye de lire la regle courante
+
             if ($row = $stm->fetch()) {
                 //vérifie les conditions et les mots
                 if (CheckCondition($row["wid1"], $row["wid2"], $row["pgm"])) {
@@ -79,6 +80,98 @@ switch ($_SESSION["etat_partie"]["jeu"]["etat_machine"]) {
         break;
     case "decodeCommand":
         decodeCommand();
+        break;
+    case "QUIT":
+        if(isset($_POST["command"])){
+            $command = strtoupper($_POST["command"]);
+            if($command=="YES"){
+                $_SESSION["etat_partie"]["jeu"]["etat_machine"] = "tbl";
+                $_SESSION["etat_partie"]["jeu"]["num_instruction"]++;
+            }else{
+                Done();
+            }
+            echo json_encode(array("action"=>"NOP"));
+        }
+        break;
+    case "END":
+        if(isset($_POST["command"])){
+            $command = strtoupper($_POST["command"]);
+            if($command=="YES"){
+                $_SESSION["etat_partie"]["jeu"]["etat_machine"]="initialisation";
+                echo json_encode(array("action"=>"NOP"));
+            }else{
+                echo json_encode(array("action"=>"LOGOUT"));
+            }
+        }
+        break;
+    case "LOAD":
+        $uid=$_SESSION["uid"];
+        $slot=$_SESSION["etat_partie"]["jeu"]["entree_table"][1];
+        $slotsUsed = $_SESSION["etat_partie"]["slotsUsed"];
+        if(in_array($slot,$slotsUsed)){
+            $stm=$dbh->prepare("SELECT savedata FROM savegame WHERE uid=? AND slot=?");
+            $stm->execute(array($uid, $slot));
+            $row=$stm->fetch();
+            $_SESSION["etat_partie"]=unserialize($row["savedata"]);
+            $_SESSION["etat_partie"]["jeu"]["etat_machine"]="clear";
+            echo json_encode(array("action"=>"NOP"));
+        }elseif ($slot == null){
+            $stm=$dbh->prepare("SELECT autosave FROM usr WHERE uid=?");
+            $stm->execute(array($uid));
+            $row=$stm->fetch();
+            if ($row["autosave"]!=null){
+                $_SESSION["etat_partie"]=unserialize($row["autosave"]);
+                $_SESSION["etat_partie"]["jeu"]["etat_machine"]="clear";
+                echo json_encode(array("action"=>"NOP"));
+            }else{
+                Done();
+                echo json_encode(array("action"=>"TEXT", "str"=>"No saved game ! :("));
+            }
+
+        }else{
+            Done();
+            echo json_encode(array("action"=>"TEXT", "str"=>"No saved game in slot ". $slot . " ! :("));
+        }
+        break;
+    case "SAVE":
+        $uid=$_SESSION["uid"];
+        $slot=$_SESSION["etat_partie"]["jeu"]["entree_table"][1];
+
+        $stm = $dbh->prepare("SELECT slot FROM savegame WHERE uid=? AND savedata IS NULL");
+        $stm->execute(array($uid));
+        $slots = [];
+        while ($row = $stm->fetch()) {
+            $slots[] = $row["slot"];
+        }
+        
+        if(in_array($slot, $slots)){
+            $_SESSION["etat_partie"]["slotsUsed"][] = $slot;
+            $_SESSION["etat_partie"]["affichage"][]="Game saved in slot ". $slot . " ! :)";
+            $saveData=serialize($_SESSION["etat_partie"]);
+            $stm=$dbh->prepare("UPDATE savegame SET savedata=? WHERE uid=? AND slot=?");
+            $stm->execute(array($saveData, $uid,$slot));
+
+            $_SESSION["etat_partie"]["jeu"]["etat_machine"]="clear";
+            $saveData=serialize($_SESSION["etat_partie"]);
+
+            $stm=$dbh->prepare("UPDATE usr SET autosave=? WHERE uid=?");
+            $stm->execute(array($saveData, $uid));
+
+            unset($slots[array_search($slot, $slots)]);
+            $slots = array_values($slots);
+
+            Done();
+            echo json_encode(array("action" => "SAVESLOT", "str" => "Game saved in slot ". $slot . " ! :)", "slots" => $slots));
+        }elseif ($slot == null){
+            $_SESSION["etat_partie"]["affichage"][]="Game saved ! :)";
+            $saveData=serialize($_SESSION["etat_partie"]);
+            $stm=$dbh->prepare("UPDATE usr SET autosave=? WHERE uid=?");
+            $stm->execute(array($saveData, $uid));
+            Done();
+            echo json_encode(array("action" => "TEXT", "str" => "Game saved ! :)"));
+        }else{
+            echo json_encode(array("action"=>"NOP"));
+        }
         break;
 }
 
@@ -165,8 +258,11 @@ function decodeCommand(): void{
             $command=substr($command, 0, $wordsize);
             $stm=$dbh->prepare("SELECT wid FROM vocab WHERE SUBSTRING(word, 1, ?) = ?");
             $stm->execute(array($wordsize, $command));
-            if ($row=$stm->fetch()) {
+            if ($row=$stm->fetch()){
                 $words[]=$row["wid"];
+                $count++;
+            }elseif(is_numeric($command)){
+                $words[]=$command;
                 $count++;
             }
             if($count==2){
@@ -415,11 +511,41 @@ function CheckInstruction($pgm): void{
             echo json_encode(array("action" => "NOP"));
             break;
         case "QUIT":
-            echo json_encode(array("action" => "NOP"));
-            break;
+            $message="";
+            $stm = $dbh->prepare("SELECT message FROM smsg WHERE smid=12");
+            $stm->execute();
+            $row = $stm->fetch();
+            $message .= $row["message"]. " ";
+            $stm = $dbh->prepare("SELECT message FROM smsg WHERE smid=30");
+            $stm->execute();
+            $row = $stm->fetch();
+            $message .= $row["message"]." ";
+            $stm = $dbh->prepare("SELECT message FROM smsg WHERE smid=31");
+            $stm->execute();
+            $row = $stm->fetch();
+            $message .= $row["message"];
+            $_SESSION["etat_partie"]["affichage"][]=$message;
+            $_SESSION["etat_partie"]["jeu"]["etat_machine"]="QUIT";
+            echo json_encode(array("action" => "YESNO", "str"=> $message));
+            return;
         case "END":
-            echo json_encode(array("action" => "LOGOUT"));
-            break;
+            $message="";
+            $stm = $dbh->prepare("SELECT message FROM smsg WHERE smid=13");
+            $stm->execute();
+            $row = $stm->fetch();
+            $message .= $row["message"]. " ";
+            $stm = $dbh->prepare("SELECT message FROM smsg WHERE smid=30");
+            $stm->execute();
+            $row = $stm->fetch();
+            $message .= $row["message"]." ";
+            $stm = $dbh->prepare("SELECT message FROM smsg WHERE smid=31");
+            $stm->execute();
+            $row = $stm->fetch();
+            $message .= $row["message"];
+            $_SESSION["etat_partie"]["affichage"][]=$message;
+            $_SESSION["etat_partie"]["jeu"]["etat_machine"]="END";
+            echo json_encode(array("action" => "YESNO", "str"=> $message));
+            return;
         case "DONE":
             Done();
             echo json_encode(array("action" => "NOP"));
@@ -433,21 +559,18 @@ function CheckInstruction($pgm): void{
             echo json_encode(array("action" => "TEXT", "str" => $row["message"]));
             return;
         case "ANYKEY":
-            echo json_encode(array("action" => "ANYKEY"));
+            $stm=$dbh->prepare("SELECT message FROM smsg WHERE smid=16");
+            $stm->execute();
+            $row=$stm->fetch();
+            $_SESSION["etat_partie"]["affichage"][]=$row["message"];
+            echo json_encode(array("action" => "ANYKEY", "str"=>$row["message"]));
             break;
         case "SAVE":
-            $uid=$_SESSION["uid"];
-            $saveData=serialize($_SESSION["etat_partie"]);
-            $stm=$dbh->prepare("UPDATE usr SET autosave=? WHERE uid=?");
-            $stm->execute(array($saveData, $uid));
+            $_SESSION["etat_partie"]["jeu"]["etat_machine"]="SAVE";
             echo json_encode(array("action" => "NOP"));
             break;
         case "LOAD":
-            $uid=$_SESSION["uid"];
-            $stm=$dbh->prepare("SELECT autosave FROM usr WHERE uid=?");
-            $stm->execute(array($uid));
-            $row=$stm->fetch();
-            $_SESSION["etat_partie"]=unserialize($row["autosave"]);
+            $_SESSION["etat_partie"]["jeu"]["etat_machine"]="LOAD";
             echo json_encode(array("action" => "NOP"));
             break;
         case "TURNS":
@@ -545,7 +668,7 @@ function CheckInstruction($pgm): void{
             else{
                 $_SESSION["etat_partie"]["positionObj"][$obj]["pos"] = -3;
                 $_SESSION["etat_partie"]["flags"][1]++;
-                if ($_SESSION["etat_partie"]["flags"][1] > 255) $_SESSION["etat_partie"]["flags"][1] = 255;
+                if ($_SESSION["etat_partie"]["flags"][1] > 255) $_SESSION["etat_partie"]["flags"][1] = 0;
                 echo json_encode(array("action" => "NOP"));
             }
             break;
@@ -629,7 +752,7 @@ function CheckInstruction($pgm): void{
             }else{
                 $_SESSION["etat_partie"]["positionObj"][$obj]["pos"] = -2;
                 $_SESSION["etat_partie"]["flags"][1]++;
-                if ($_SESSION["etat_partie"]["flags"][1] > 255) $_SESSION["etat_partie"]["flags"][1] = 255;
+                if ($_SESSION["etat_partie"]["flags"][1] > 255) $_SESSION["etat_partie"]["flags"][1] = 0;
                 echo json_encode(array("action" => "NOP"));
             }
             break;
@@ -752,7 +875,7 @@ function CheckInstruction($pgm): void{
             break;
         case "PLUS":
             $_SESSION["etat_partie"]["flags"][(int)$instruction["param1"]] += (int)$instruction["param2"];
-            if ($_SESSION["etat_partie"]["flags"][(int)$instruction["param1"]] > 255) $_SESSION["etat_partie"]["flags"][(int)$instruction["param1"]] = 0;
+            if ($_SESSION["etat_partie"]["flags"][(int)$instruction["param1"]] > 255) $_SESSION["etat_partie"]["flags"][(int)$instruction["param1"]] %= 255;
             echo json_encode(array("action" => "NOP"));
             break;
         case "MINUS":
@@ -767,7 +890,6 @@ function CheckInstruction($pgm): void{
     }
     $_SESSION["etat_partie"]["jeu"]["num_instruction"]++;
 }
-
 
 function Done(): void{
     $_SESSION["etat_partie"]["jeu"]["etat_machine"] = "tbl";

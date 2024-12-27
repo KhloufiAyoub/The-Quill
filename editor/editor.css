@@ -1,9 +1,10 @@
 #menu {
+    z-index: 4;
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
-    height: 60px;
+    height: 100px;
     --font-color: #323232;
     --input-focus: #ff0000;
     --bg-color: #fff;
@@ -15,10 +16,10 @@
     justify-content: center;
     align-items: center;
     border: 2px solid var(--main-color);
-    z-index: 1;
 }
 #editor{
     position: absolute;
+    width: 75%;
     top: 80px;
     left: 0;
     padding: 20px;
@@ -33,7 +34,7 @@
 }
 
 #menu ul li {
-    margin: 0;
+    margin: 15px;
     text-align: center;
 }
 
@@ -46,13 +47,31 @@
     font-family: 'Press Start 2P', cursive;
 }
 
-#AddRoom, #AddMsg, #AddObj,#AddMove, #AddVocab,#AddAction,#ActionButton {
+#AddRoom, #AddMsg, #AddObj,#AddMove, #AddVocab,#AddAction {
     display: none;
+}
+
+#AddButton{
+    display: block;
+
+}
+#ShowButton{
+    display: block;
+}
+
+#AddUl{
+    position: relative;
+}
+
+#AddUl li {
+    position: absolute;
+    top: -49px;
+    left: -300px;
 }
 
 #game input[type="button"],#menu ul li input[type="button"] {
     width: 100%;
-    height: 40px;
+    height: 60px;
     padding: 10px;
     margin-bottom: 10px;
     border: 2px solid var(--main-color);
@@ -63,7 +82,6 @@
     font-weight: 600;
     transition: box-shadow 0.3s ease, transform 0.3s ease;
 }
-
 
 
 #menu ul li input[type="button"]::placeholder {
@@ -102,121 +120,275 @@
 #maxObj_p, #maxSave_p, #wordSize_p{
     margin: 10px 0;
 }
+table{
+    width: 100%;
+    margin-top: 30px;
+    padding: 10px;
+    font-size: 25px;
+    text-align: center;
+}
+
 table, td, tr, th{
     border: 1px solid black;
     border-collapse: collapse;
 }
-td, tr{
+
+td, tr,th{
+    padding: 12px;
     border-collapse: collapse;
 }
 
-/**.input__container {
-  position: relative;
-  background: #f0f0f0;
-  padding: 20px;
-  display: flex;
-  justify-content: flex-start;
-  align-items: center;
-  gap: 15px;
-  border: 4px solid #000;
-  max-width: 350px;
-  transition: all 400ms cubic-bezier(0.23, 1, 0.32, 1);
-  transform-style: preserve-3d;
-  transform: rotateX(10deg) rotateY(-10deg);
-  perspective: 1000px;
-  box-shadow: 10px 10px 0 #000;
+.editTd, .deleteTd{
+    width: 65px;
 }
 
-.input__container:hover {
-  transform: rotateX(5deg) rotateY(1 deg) scale(1.05);
-  box-shadow: 25px 25px 0 -5px #e9b50b, 25px 25px 0 0 #000;
+
+/* From Uiverse.io by vinodjangid07 */
+.bin-button {
+    margin-left: 5px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 55px;
+    height: 55px;
+    border-radius: 15px;
+    background-color: rgb(255, 95, 95);
+    cursor: pointer;
+    border: 3px solid rgb(255, 201, 201);
+    transition-duration: 0.3s;
+}
+.bin-bottom {
+    width: 15px;
+}
+.bin-top {
+    width: 17px;
+    transform-origin: right;
+    transition-duration: 0.3s;
+}
+.bin-button:hover .bin-top {
+    transform: rotate(45deg);
+}
+.bin-button:hover {
+    background-color: rgb(255, 0, 0);
+}
+.bin-button:active {
+    transform: scale(0.9);
 }
 
-.shadow__input {
-  content: "";
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  left: 0;
-  bottom: 0;
-  z-index: -1;
-  transform: translateZ(-50px);
-  background: linear-gradient(
-    45deg,
-    rgba(255, 107, 107, 0.4) 0%,
-    rgba(255, 107, 107, 0.1) 100%
-  );
-  filter: blur(20px);
+/* From Uiverse.io by vinodjangid07 */
+.editBtn {
+    margin-left: 5px;
+    width: 55px;
+    height: 55px;
+    border-radius: 20px;
+    border: none;
+    background-color: rgb(93, 93, 116);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0px 5px 10px rgba(0, 0, 0, 0.123);
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s;
+}
+.editBtn::before {
+    content: "";
+    width: 200%;
+    height: 200%;
+    background-color: rgb(102, 102, 141);
+    position: absolute;
+    z-index: 1;
+    transform: scale(0);
+    transition: all 0.3s;
+    border-radius: 50%;
+    filter: blur(10px);
+}
+.editBtn:hover::before {
+    transform: scale(1);
+}
+.editBtn:hover {
+    box-shadow: 0px 5px 10px rgba(0, 0, 0, 0.336);
 }
 
-.input__button__shadow {
-  cursor: pointer;
-  border: 3px solid #000;
-  background: #e9b50b;
-  transition: all 400ms cubic-bezier(0.23, 1, 0.32, 1);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: 10px;
-  transform: translateZ(20px);
-  position: relative;
-  z-index: 3;
-  font-weight: bold;
-  text-transform: uppercase;
+.editBtn svg {
+    height: 17px;
+    fill: white;
+    z-index: 3;
+    transition: all 0.2s;
+    transform-origin: bottom;
+}
+.editBtn:hover svg {
+    transform: rotate(-15deg) translateX(5px);
+}
+.editBtn::after {
+    content: "";
+    width: 25px;
+    height: 1.5px;
+    position: absolute;
+    bottom: 19px;
+    left: -5px;
+    background-color: white;
+    border-radius: 2px;
+    z-index: 2;
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.5s ease-out;
+}
+.editBtn:hover::after {
+    transform: scaleX(1);
+    left: 0px;
+    transform-origin: right;
 }
 
-.input__button__shadow:hover {
-  background: #e9b50b;
-  transform: translateZ(10px) translateX(-5px) translateY(-5px);
-  box-shadow: 5px 5px 0 0 #000;
+
+/* From Uiverse.io by KINGFRESS */
+.submit-btn {
+    font-weight: bold;
+    color: white;
+    background-color: #171717;
+    padding: 1em 2em;
+    border: none;
+    border-radius: .6rem;
+    position: relative;
+    cursor: pointer;
+    overflow: hidden;
 }
 
-.input__button__shadow svg {
-  fill: #000;
-  width: 25px;
-  height: 25px;
+.submit-btn span:not(:nth-child(6)) {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    height: 30px;
+    width: 30px;
+    background-color: #0c66ed;
+    border-radius: 50%;
+    transition: .6s ease;
 }
 
-.input__search {
-  width: 100%;
-  outline: none;
-  border: 3px solid #000;
-  padding: 15px;
-  font-size: 18px;
-  background: #fff;
-  color: #000;
-  transform: translateZ(10px);
-  transition: all 400ms cubic-bezier(0.23, 1, 0.32, 1);
-  position: relative;
-  z-index: 3;
-  font-family: "Roboto", Arial, sans-serif;
-  letter-spacing: -0.5px;
+.submit-btn span:nth-child(6) {
+    position: relative;
 }
 
-.input__search::placeholder {
-  color: #666;
-  font-weight: bold;
-  text-transform: uppercase;
+.submit-btn span:nth-child(1) {
+    transform: translate(-3.3em, -4em);
 }
 
-.input__search:hover,
-.input__search:focus {
-  background: #f0f0f0;
-  transform: translateZ(20px) translateX(-5px) translateY(-5px);
-  box-shadow: 5px 5px 0 0 #000;
+.submit-btn span:nth-child(2) {
+    transform: translate(-6em, 1.3em);
 }
 
-.input__container::before {
-  content: "USERNAME";
-  position: absolute;
-  top: -15px;
-  left: 20px;
-  background: #e9b50b;
-  color: #000;
-  font-weight: bold;
-  padding: 5px 10px;
-  font-size: 14px;
-  transform: translateZ(50px);
-  z-index: 4;
-  border: 2px solid #000;
+.submit-btn span:nth-child(3) {
+    transform: translate(-.2em, 1.8em);
+}
+
+.submit-btn span:nth-child(4) {
+    transform: translate(3.5em, 1.4em);
+}
+
+.submit-btn span:nth-child(5) {
+    transform: translate(3.5em, -3.8em);
+}
+
+.submit-btn:hover span:not(:nth-child(6)) {
+    transform: translate(-50%, -50%) scale(4);
+    transition: 1.5s ease;
+}
+
+/* From Uiverse.io by Z4drus */
+.button-container {
+    display: flex;
+    justify-content: flex-start;
+    margin: 20px;
+}
+
+.button-3d {
+    -webkit-appearance: none;
+    appearance: none;
+    position: relative;
+    border-width: 0;
+    padding: 0 4px; /* Reduced padding */
+    min-width: 3em; /* Reduced min-width */
+    min-height: 3em; /* Reduced min-height */
+    box-sizing: border-box;
+    background: transparent;
+    font: inherit;
+    cursor: pointer;
+    margin: 5px; /* Reduced margin */
+    border-radius: 20px;
+}
+
+.button-top {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    z-index: 2;
+    padding: 4px 8px; /* Reduced padding */
+    transform: translateY(0);
+    color: #fff;
+    background-image: linear-gradient(145deg, #6a11cb, #2575fc);
+    text-shadow: 0 -1px rgba(0, 0, 0, 0.25);
+    border-radius: 20px;
+    transition: transform 0.3s, border-radius 0.3s, background 10s;
+}
+
+.button-3d:active .button-top {
+    border-radius: 10px 10px 8px 8px / 8px;
+    transform: translateY(2px);
+    background-image: linear-gradient(145deg, #2575fc, #6a11cb);
+}
+
+.button-bottom {
+    position: absolute;
+    z-index: 1;
+    bottom: 4px;
+    left: 4px;
+    border-radius: 20px;
+    padding-top: 6px;
+    width: calc(100% - 8px);
+    height: calc(100% - 10px);
+    background-image: linear-gradient(145deg, #2575fc, #6a11cb);
+    box-shadow: 0px 2px 3px 0px rgba(0, 0, 0, 0.5);
+    transition: border-radius 0.2s, padding-top 0.2s;
+}
+
+.button-base {
+    position: absolute;
+    z-index: 0;
+    top: 4px;
+    left: 0;
+    border-radius: 20px;
+    width: 100%;
+    height: calc(100% - 4px);
+    background-color: rgba(0, 0, 0, 0.15);
+    box-shadow: 0 1px 1px 0 rgba(255, 255, 255, 0.75),
+    inset 0 2px 2px rgba(0, 0, 0, 0.25);
+    transition: border-radius 0.2s, padding-top 0.2s;
+}
+
+.button-3d:active .button-bottom {
+    border-radius: 10px 10px 8px 8px / 8px;
+    padding-top: 0;
+}
+
+.button-3d:active .button-base {
+    border-radius: 10px 10px 8px 8px / 8px;
+}
+
+#addCondition .button-top, #addCondition .button-3d:active,#addCondition .button-bottom {
+    background-image: linear-gradient(145deg, #67d37f, #218838); /* Green color */
+}
+#addInstruction .button-top, #addInstruction .button-3d:active,#addInstruction .button-bottom {
+    background-image: linear-gradient(145deg, #67d37f, #218838); /* Green color */
+}
+
+#minusInstruction .button-top, #minusInstruction .button-3d:active,#minusInstruction .button-bottom {
+    background-image: linear-gradient(145deg, #e47785, #c82333); /* Red color */
+}
+
+#minusCondition .button-top, #minusCondition .button-3d:active,#minusCondition .button-bottom {
+    background-image: linear-gradient(145deg, #e47785, #c82333); /* Red color */
 }

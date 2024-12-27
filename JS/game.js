@@ -144,6 +144,19 @@ function action(str) {
                 document.removeEventListener("keydown", handler);
             });
             break;
+        case "YESNO":
+            area.value += result["str"].replace(/<br>/g, "\n") + "\n\n";
+            area.scrollTop = area.scrollHeight;
+            $("submitInput").disabled = false;
+            $("logout").disabled = false;
+            $("gameInput").focus();
+            break;
+        case "SAVESLOT":
+            area.value += result["str"].replace(/<br>/g, "\n") + "\n\n";
+            area.value += "Remaining slots : " + result["slots"] + "\n\n";
+            area.scrollTop = area.scrollHeight;
+            stateMachine();
+            break;
     }
 }
 
@@ -187,6 +200,7 @@ function getCommand(){
     xhr.onreadystatechange = function(){
         if (xhr.readyState === 4 && xhr.status === 200){
             action(xhr.responseText);
+            console.log(xhr.responseText);
             gameInput.value = "";
         }
     }
@@ -200,6 +214,7 @@ function stateMachine(){
     var xhr= new XMLHttpRequest();
     xhr.onreadystatechange = function(){
         if (xhr.readyState === 4 && xhr.status === 200){
+            console.log(xhr.responseText)
             action(xhr.responseText);
         }
     }

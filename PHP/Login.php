@@ -31,6 +31,13 @@ if (isset($_POST["username"]) && isset($_POST["psw"])) {
             $stm=$dbh->prepare("INSERT INTO usr(login,passwd) VALUES (?,?)");
             $stm->execute(array($user, hash('sha256', $pass)));
             $_SESSION["uid"]=$dbh->lastInsertId();
+            $stm=$dbh->prepare("SELECT value FROM params WHERE  param='maxsave'");
+            $stm->execute();
+            $row=$stm->fetch();
+            for ($i=1; $i<=$row["value"]; $i++) {
+                $stm=$dbh->prepare("INSERT INTO savegame(uid, slot,savedata) VALUES (?,?,null)");
+                $stm->execute(array($_SESSION["uid"], $i));
+            }
             $_SESSION["etat_partie"]["jeu"]["etat_machine"]="initialisation";
         }
     }else{

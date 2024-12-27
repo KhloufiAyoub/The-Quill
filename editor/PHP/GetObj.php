@@ -9,7 +9,7 @@ $stm=$dbh->prepare("SELECT objid, objdesc FROM obj ORDER BY objid");
 $stm->execute();
 
 while ($row=$stm->fetch()){
-    $value=array("objid"=>$row["objid"], "objdesc"=>$row["objdesc"]);
+    $value=array("ID de l'objet"=>$row["objid"], "Description"=>$row["objdesc"]);
     $a[]=$value;
 }
 

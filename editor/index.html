@@ -10,22 +10,49 @@
 
 <body>
     <div id="menu">
-        <ul>
-            <li><input type="button" value="Ajouter une piece" id="RoomButton"></li>
-            <li><input type="button" value="Ajouter un message" id="MsgButton"></li>
-            <li><input type="button" value="Ajouter un objet" id="ObjButton"></li>
-            <li><input type="button" value="Ajouter un déplacement" id="MoveButton"></li>
-            <li><input type="button" value="Ajouter un mot" id="VocabButton"></li>
-            <li><input type="button" value="Ajouter une action" id="ActionButton"></li>
-        </ul>
+        <div id="AddButton">
+            <ul id="AddUl">
+                <li><input type="button" value="Ajouter une piece" id="RoomButton"></li>
+                <li><input type="button" value="Ajouter un message" id="MsgButton"></li>
+                <li><input type="button" value="Ajouter un objet" id="ObjButton"></li>
+                <li><input type="button" value="Ajouter un déplacement" id="MoveButton"></li>
+                <li><input type="button" value="Ajouter un mot" id="VocabButton"></li>
+                <li><input type="button" value="Ajouter une action" id="ActionButton"></li>
+            </ul>
+        </div>
+        <div id="ShowButton">
+            <ul>
+                <li><input type="button" id="GetRoom" value="Pièces"></li>
+                <li><input type="button" id="GetMessage" value="Messages"></li>
+                <li><input type="button" id="GetSmsg" value="Messages système"></li>
+                <li><input type="button" id="GetMove" value="Déplacements"></li>
+                <li><input type="button" id="GetObject" value="Objets"></li>
+                <li><input type="button" id="GetVocab" value="Mot de vocabulaires"></li>
+                <li><input type="button" id="GetAction" value="Actions"></li>
+            </ul>
+        </div>
     </div>
     <div id="editor">
         <div id="room">
             <div id="AddRoom">
                 <h2>Éditeur de pieces</h2>
                 <textarea id="RoomValue" rows="10" cols="50" placeholder="Éditez vos pieces ici..."></textarea><br>
-                <input type="submit" id="RoomSubmit" value="Ajouter">
-                <input type="button" id="RoomCancel" value="Annuler">
+                <button id="RoomSubmit" class="submit-btn">
+                    <span class="circle1"></span>
+                    <span class="circle2"></span>
+                    <span class="circle3"></span>
+                    <span class="circle4"></span>
+                    <span class="circle5"></span>
+                    <span class="text">Ajouter</span>
+                </button>
+                <button id="RoomCancel" class="submit-btn">
+                    <span class="circle1"></span>
+                    <span class="circle2"></span>
+                    <span class="circle3"></span>
+                    <span class="circle4"></span>
+                    <span class="circle5"></span>
+                    <span class="text">Annuler</span>
+                </button>
             </div>
         </div>
 
@@ -33,8 +60,22 @@
             <div id="AddMsg">
                 <h2>Éditeur de messages</h2>
                 <textarea id="MsgValue" rows="10" cols="50" placeholder="Éditez vos messages ici..."></textarea><br>
-                <input type="submit" id="MsgSubmit" value="Ajouter">
-                <input type="button" id="MsgCancel" value="Annuler">
+                <button id="MsgSubmit" class="submit-btn">
+                    <span class="circle1"></span>
+                    <span class="circle2"></span>
+                    <span class="circle3"></span>
+                    <span class="circle4"></span>
+                    <span class="circle5"></span>
+                    <span class="text">Ajouter</span>
+                </button>
+                <button id="MsgCancel" class="submit-btn">
+                    <span class="circle1"></span>
+                    <span class="circle2"></span>
+                    <span class="circle3"></span>
+                    <span class="circle4"></span>
+                    <span class="circle5"></span>
+                    <span class="text">Annuler</span>
+                </button>
             </div>
         </div>
 
@@ -42,8 +83,22 @@
             <div id="AddObj">
                 <h2>Éditeur d'objets</h2>
                 <textarea id="ObjValue" rows="10" cols="50" placeholder="Éditez vos objets ici..."></textarea><br>
-                <input type="submit" id="ObjSubmit" value="Ajouter">
-                <input type="button" id="ObjCancel" value="Annuler">
+                <button id="ObjSubmit" class="submit-btn">
+                    <span class="circle1"></span>
+                    <span class="circle2"></span>
+                    <span class="circle3"></span>
+                    <span class="circle4"></span>
+                    <span class="circle5"></span>
+                    <span class="text">Ajouter</span>
+                </button>
+                <button id="ObjCancel" class="submit-btn">
+                    <span class="circle1"></span>
+                    <span class="circle2"></span>
+                    <span class="circle3"></span>
+                    <span class="circle4"></span>
+                    <span class="circle5"></span>
+                    <span class="text">Annuler</span>
+                </button>
             </div>
         </div>
         <div id="vocab">
@@ -60,8 +115,22 @@
             <div id="AddMove">
                 <h2>Éditeur de déplacement</h2>
                 <div id="MoveSelect"></div>
-                <input type="submit" id="MoveSubmit" value="Ajouter">
-                <input type="button" id="MoveCancel" value="Annuler">
+                <button id="MoveSubmit" class="submit-btn">
+                    <span class="circle1"></span>
+                    <span class="circle2"></span>
+                    <span class="circle3"></span>
+                    <span class="circle4"></span>
+                    <span class="circle5"></span>
+                    <span class="text">Ajouter</span>
+                </button>
+                <button id="MoveCancel" class="submit-btn">
+                    <span class="circle1"></span>
+                    <span class="circle2"></span>
+                    <span class="circle3"></span>
+                    <span class="circle4"></span>
+                    <span class="circle5"></span>
+                    <span class="text">Annuler</span>
+                </button>
             </div>
         </div>
 
@@ -79,16 +148,60 @@
                 <label for="word2">Mot 2 : </label>
                 <select id="word2"></select><br>
 
-                <img src="../img/icone-add.png" id="addCondition">
-                <img src="../img/icone-minus.png" id="minusCondition"><br>
+                <!-- From Uiverse.io by Z4drus  -->
+                <div class="button-container">
+                    <button class="button-3d"  id="addCondition">
+                        <div class="button-top">
+                            <span class="material-icons" >+</span>
+                        </div>
+                        <div class="button-bottom"></div>
+                        <div class="button-base"></div>
+                    </button>
+                    <button class="button-3d"  id="minusCondition">
+                        <div class="button-top">
+                            <span class="material-icons">-</span>
+                        </div>
+                        <div class="button-bottom"></div>
+                        <div class="button-base"></div>
+                    </button>
+                </div>
                 <div id="CondDiv"></div>
 
-                <img src="../img/icone-add.png" id="addInstruction">
-                <img src="../img/icone-minus.png" id="minusInstruction"><br>
+                <div class="button-container">
+                    <button class="button-3d"  id="addInstruction">
+                        <div class="button-top">
+                            <span class="material-icons" >+</span>
+                        </div>
+                        <div class="button-bottom"></div>
+                        <div class="button-base"></div>
+                    </button>
+                    <button class="button-3d"  id="minusInstruction">
+                        <div class="button-top">
+                            <span class="material-icons">-</span>
+                        </div>
+                        <div class="button-bottom"></div>
+                        <div class="button-base"></div>
+                    </button>
+                </div>
+
                 <div id="InstrDiv"></div>
 
-                <input type="submit" id="ActionSubmit" value="Ajouter">
-                <input type="button" id="ActionCancel" value="Annuler">
+                <button id="ActionSubmit" class="submit-btn">
+                    <span class="circle1"></span>
+                    <span class="circle2"></span>
+                    <span class="circle3"></span>
+                    <span class="circle4"></span>
+                    <span class="circle5"></span>
+                    <span id="ActionSubmitText" class="text">Ajouter</span>
+                </button>
+                <button id="ActionCancel" class="submit-btn">
+                    <span class="circle1"></span>
+                    <span class="circle2"></span>
+                    <span class="circle3"></span>
+                    <span class="circle4"></span>
+                    <span class="circle5"></span>
+                    <span class="text">Annuler</span>
+                </button>
             </div>
         </div>
 
@@ -98,6 +211,7 @@
     </div>
 
     <div id="params">
+        <h2>Paramètres : </h2>
         <div id="word">
             <p id="wordSize_p"></p>
             <input type="number" id="wordSize">
@@ -106,20 +220,28 @@
         <div id="mobj">
             <p id="maxObj_p"></p>
             <input type="number" id="maxObj">
-            <input type="submit" id="submitObj" value="Modifier">
+            <button id="submitObj" class="submit-btn">
+                <span class="circle1"></span>
+                <span class="circle2"></span>
+                <span class="circle3"></span>
+                <span class="circle4"></span>
+                <span class="circle5"></span>
+                <span class="text">Modifier</span>
+            </button>
         </div>
         <div id="save">
             <p id="maxSave_p"></p>
             <input type="number" id="maxSave">
-            <input type="submit" id="submitSave" value="Modifier">
+            <button id="submitSave" class="submit-btn">
+                <span class="circle1"></span>
+                <span class="circle2"></span>
+                <span class="circle3"></span>
+                <span class="circle4"></span>
+                <span class="circle5"></span>
+                <span class="text">Modifier</span>
+            </button>
         </div>
-        <input type="button" id="GetRoom" value="GetRoom">
-        <input type="button" id="GetMessage" value="GetMessage">
-        <input type="button" id="GetSmsg" value="GetSmsg">
-        <input type="button" id="GetMove" value="GetMove">
-        <input type="button" id="GetObject" value="GetObject">
-        <input type="button" id="GetVocab" value="GetVocab">
-        <input type="button" id="GetAction" value="GetAction">
+
     </div>
 </body>
 </html>

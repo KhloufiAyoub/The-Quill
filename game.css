@@ -1,9 +1,18 @@
+body{
+    background-image: url('img/Background5.png');
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    margin: 0;
+    padding: 0;
+}
 #page {
     display: flex;
     justify-content: center;
     align-items: center;
     height: 100vh;
 }
+
 #auth, #game {
     display: flex;
     width: 280px;

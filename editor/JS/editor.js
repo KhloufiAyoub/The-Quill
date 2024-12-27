@@ -61,8 +61,11 @@ const instructions = [
 
 function init(){
     $("RoomButton").onclick = ShowRoomForm;
+    hide("RoomButton");
     $("MsgButton").onclick = ShowMessageForm;
+    hide("MsgButton")
     $("ObjButton").onclick = ShowObjectForm;
+    hide("ObjButton")
     $("MoveButton").onclick = ShowMoveForm;
     $("VocabButton").onclick = ShowVocabForm;
 
@@ -137,7 +140,7 @@ function ShowVocabForm(){
     show("AddVocab");
 }
 
-function ShowMoveForm(){
+function ShowMoveForm() {
     hide("AddRoom");
     hide("AddMsg");
     hide("AddObj");
@@ -157,20 +160,22 @@ function ShowMoveForm(){
         label.textContent = "Déplacement : ";
         label.htmlFor = "rid";
         maDiv.appendChild(label);
-        InsertSelect(maDiv, arrays[0], "roomdesc", "rid", false,"", [], "rid");
-        maDiv.appendChild(document.createElement("BR"))
+        InsertSelect(maDiv, arrays[0], "Description de la pièce", "ID de la pièce", false, "", [], "rid");
+
+        maDiv.appendChild(document.createElement("BR"));
         label = document.createElement("LABEL");
         label.textContent = "Mot : ";
         label.htmlFor = "wid";
         maDiv.appendChild(label);
-        InsertSelect(maDiv, arrays[1],"word", "wid",  false, "",[],"wid");
-        maDiv.appendChild(document.createElement("BR"))
+        InsertSelect(maDiv, arrays[1], "Mot", "ID du mot", false, "", [], "wid");
+
+        maDiv.appendChild(document.createElement("BR"));
         label = document.createElement("LABEL");
         label.textContent = "Nouvelle pièce : ";
         label.htmlFor = "newroom";
         maDiv.appendChild(label);
-        InsertSelect(maDiv, arrays[2],"roomdesc", "rid", false, "",[],"newroom");
-        maDiv.appendChild(document.createElement("BR"))
+        InsertSelect(maDiv, arrays[2], "Description de la pièce", "ID de la pièce", false, "", [], "newroom");
+        maDiv.appendChild(document.createElement("BR"));
     });
 }
 
@@ -192,10 +197,11 @@ function ShowActionForm(str, data=null){
 
     if(data==null){
         result = JSON.parse(str);
+        $("ActionSubmitText").innerHTML = "Ajouter"
         aid.value = -1
     }else{
         result= str
-        actionSubmit.value = "Modifier";
+        $("ActionSubmitText").innerHTML = "Modifier"
         actionTitle.textContent = "Modifier l'action";
         aid.value = data["aid"];
     }
@@ -217,7 +223,7 @@ function ShowActionForm(str, data=null){
     option.value = 0
     option.text = 0
     if(data!=null){
-        if(data["tbl"] === 0){
+        if(data["Table"] === 0){
             option.selected = true;
         }
     }
@@ -225,7 +231,7 @@ function ShowActionForm(str, data=null){
     option2.value = 1
     option2.text = 1
     if(data!=null) {
-        if (data["tbl"] === 1) {
+        if (data["Table"] === 1) {
             option2.selected = true;
         }
     }
@@ -249,20 +255,20 @@ function ShowActionForm(str, data=null){
     word2.add(option2);
     for(var i = 0; i <  result["vocab"].length; i++){
         option = document.createElement("OPTION");
-        option.text = result["vocab"][i]["word"];
-        option.value = result["vocab"][i]["wid"];
+        option.text = result["vocab"][i]["Mot"];
+        option.value = result["vocab"][i]["ID du mot"];
         if(data!=null){
-            if (result["vocab"][i]["wid"] === data["wid1"]){
+            if (result["vocab"][i]["ID du mot"] === data["Mot 1"]){
                 option.selected = true;
             }
         }
         word1.add(option);
 
         option2 = document.createElement("OPTION");
-        option2.text = result["vocab"][i]["word"];
-        option2.value = result["vocab"][i]["wid"];
+        option2.text = result["vocab"][i]["Mot"];
+        option2.value = result["vocab"][i]["ID du mot"];
         if(data!=null){
-            if (result["vocab"][i]["wid"] === data["wid2"]){
+            if (result["vocab"][i]["ID du mot"] === data["Mot 2"]){
                 option2.selected = true;
             }
         }
@@ -270,11 +276,11 @@ function ShowActionForm(str, data=null){
     }
 
     if(data != null){
-        for(i in data["pgm"]["condition"]){
-            InsertCondition(result,data["pgm"]["condition"][i]);
+        for(i in data["Programme"]["condition"]){
+            InsertCondition(result,data["Programme"]["condition"][i]);
         }
-        for(i in data["pgm"]["instruction"]){
-            InsertInstruction(result,data["pgm"]["instruction"][i]);
+        for(i in data["Programme"]["instruction"]){
+            InsertInstruction(result,data["Programme"]["instruction"][i]);
         }
     }else{
         InsertCondition(result,data);
@@ -351,13 +357,13 @@ function SetParamInput(par, result, div,numDiv, num, data){
             label.textContent = "Piece : ";
             label.htmlFor = id;
             div.appendChild(label);
-            InsertSelect(div, result["room"], "roomdesc", "rid", false, selected, [], id);
+            InsertSelect(div, result["room"], "Description de la pièce", "ID de la pièce", false, selected, [], id);
             break;
         case "objet":
             label.textContent = "Objet : ";
             label.htmlFor = id;
             div.appendChild(label);
-            InsertSelect(div, result["obj"], "objdesc", "objid", false, selected, [], id);
+            InsertSelect(div, result["obj"], "Description", "ID de l'objet", false, selected, [], id);
             break;
         case "flag":
             label.textContent = "Flag : ";
@@ -396,7 +402,7 @@ function SetParamInput(par, result, div,numDiv, num, data){
             label.textContent = "Message : ";
             label.htmlFor = id;
             div.appendChild(label);
-            InsertSelect(div, result["msg"], "message", "mid", false, selected, [], id);
+            InsertSelect(div, result["msg"], "Message", "ID du message", false, selected, [], id);
             break;
         case "duree" :
             label.textContent = "Durée en millisecondes : ";
@@ -561,17 +567,16 @@ function AddAction(){
         var condParam1 = $("CondDiv"+i+"Param1").value;
         var condParam2 = $("CondDiv"+i+"Param2").value;
 
-        condTab[i] = {"nom" : condition, "param1": condParam1, "param2":condParam2}
+        condTab[i-1] = {"nom" : condition, "param1": condParam1, "param2":condParam2}
     }
     var instTab=[]
     for (i = 1; i <= cptInstr; i++) {
         var instruction = $("instruction" + i).value;
         var instParam1 = $("InstrDiv" + i + "Param1").value;
         var instParam2 = $("InstrDiv" + i + "Param2").value;
-        instTab[i] = {"nom": instruction, "param1": instParam1, "param2": instParam2}
+        instTab[i-1] = {"nom": instruction, "param1": instParam1, "param2": instParam2}
     }
     var pgm = {"condition" : condTab, "instruction" : instTab}
-    console.log(pgm)
     param = param + "&pgm=" + encodeURIComponent(JSON.stringify(pgm));
 
     Add(url,param,[tblNum,wid1,wid2,condition,condParam1,condParam2,instruction,instParam1,instParam2]);
@@ -674,7 +679,13 @@ function GetMove(){
 
 function GetVocab(){
     var url="PHP/GetVocab.php";
-    Get(url,["wid","word"], "Vocab", null, true,false)
+    show("VocabButton");
+    hide("ActionButton");
+    hide("RoomButton");
+    hide("MsgButton");
+    hide("ObjButton");
+    hide("MoveButton");
+    Get(url,["ID du mot","Mot"], "Vocab", null, true,false)
 }
 
 function GetAction(){
@@ -684,6 +695,11 @@ function GetAction(){
         if (xhr.readyState === 4 && xhr.status === 200){
             ProcessRequest(xhr.responseText, ["tbl","wid1", "wid2", "pgm"],"Action", null, true, true, "action");
             show("ActionButton");
+            hide("RoomButton");
+            hide("MsgButton");
+            hide("ObjButton");
+            hide("MoveButton");
+            hide("VocabButton")
             $("ActionButton").onclick = function(){ShowActionForm(xhr.responseText)};
         }
     }
@@ -698,7 +714,7 @@ function ProcessRequest(str,elements,table, promptvalue, isDeletable, isEditable
         var tab = result;
         result= result[table2];
         result.forEach(function(item){
-            item["pgm"] = JSON.parse(item["pgm"]);
+            item["Programme"] = JSON.parse(item["Programme"]);
         })
     }
     var el=document.getElementById("maDiv");
@@ -708,7 +724,7 @@ function ProcessRequest(str,elements,table, promptvalue, isDeletable, isEditable
     //Entête du tableau
     tr = document.createElement("TR");
     for (j=0;j<elements.length;j++){
-        InsertColumn(tr, elements[j]);
+        InsertColumn(tr, elements[j],false,true);
     }
     tbl.appendChild(tr);
     //Corps du tableau
@@ -716,8 +732,8 @@ function ProcessRequest(str,elements,table, promptvalue, isDeletable, isEditable
         tr=document.createElement("TR");
         //Insertion des colonnes
         for (j=0;j<elements.length;j++) {
-            if (table === "Action" && elements[j] === "pgm"){
-                InsertColumn(tr, result[i]["pgm"],true);
+            if (table === "Action" && elements[j] === "Programme"){
+                InsertColumn(tr, result[i]["Programme"],true);
             }else{
             InsertColumn(tr, result[i][elements[j]]);
             }
@@ -726,21 +742,21 @@ function ProcessRequest(str,elements,table, promptvalue, isDeletable, isEditable
         //Insertion des images de suppression
         if (isDeletable) {
             if(table === "Deplacement") {
-                InsertDeleteImg(tr, id, table, result[i][elements[1]])
+                InsertDeleteBtn(tr, id, table, result[i][elements[1]])
             }else if(table === "Action"){
-                InsertDeleteImg(tr, result[i]["aid"], table)
+                InsertDeleteBtn(tr, result[i]["aid"], table)
             }else if(table === "Vocab"){
-                InsertDeleteImg(tr, id, table,result[i][elements[1]]);
+                InsertDeleteBtn(tr, id, table,result[i][elements[1]]);
             }else{
-                InsertDeleteImg(tr, id, table);
+                InsertDeleteBtn(tr, id, table);
             }
         }
         //Insertion des images d'édition
         if (isEditable) {
             if(table === "Action") {
-                InsertEditImg(tr, id, table, promptvalue,tab,result[i]);
+                InsertEditBtn(tr, id, table, promptvalue,tab,result[i]);
         }else{
-                InsertEditImg(tr, id, table, promptvalue);
+                InsertEditBtn(tr, id, table, promptvalue);
             }
         }
         tbl.appendChild(tr)
@@ -749,11 +765,17 @@ function ProcessRequest(str,elements,table, promptvalue, isDeletable, isEditable
 }
 
 function GetObject(){
+    show("ObjButton");
+    hide("ActionButton");
+    hide("RoomButton");
+    hide("MsgButton");
+    hide("MoveButton");
+    hide("VocabButton")
     var url="PHP/GetObj.php";
     var xhr= new XMLHttpRequest();
     xhr.onreadystatechange = function(){
         if (xhr.readyState === 4 && xhr.status === 200){
-            ProcessRequestObj(xhr.responseText,["objid","objdesc"], ["startloc", "wid"], "Objet", "Nouveau nom de l'objet :");
+            ProcessRequestObj(xhr.responseText,["ID de l'objet","Description"], ["Position de départ", "Mot associé"], "Objet", "Nouveau nom de l'objet :");
         }
     }
     xhr.open("POST",url,true);
@@ -768,10 +790,10 @@ function ProcessRequestObj(str, elements, elements2, table, promptvalue) {
     var tbl = document.createElement("TABLE");
     var tr = document.createElement("TR");
     for (j = 0; j < elements.length; j++) {
-        InsertColumn(tr, elements[j]);
+        InsertColumn(tr, elements[j],false,true);
     }
     for (j = 0; j < elements2.length; j++) {
-        InsertColumn(tr, elements2[j]);
+        InsertColumn(tr, elements2[j],false,true);
     }
     tbl.appendChild(tr);
 
@@ -789,13 +811,13 @@ function ProcessRequestObj(str, elements, elements2, table, promptvalue) {
             var id = item[elements[0]];
             var locations = {"Non cree": -1, "Porte": -2, "Transporte": -3};
             var words = {"-----": null}
-            InsertSelect(td, arrays[0], "roomdesc", "rid", true,arrays[2]["startloc"], locations, id, "ObjetSelectRoom");
+            InsertSelect(td, arrays[0], "Description de la pièce", "ID de la pièce", true,arrays[2]["Position de départ"], locations, id, "ObjetSelectRoom");
             tr.appendChild(td);
             td = document.createElement("TD");
-            InsertSelect(td, arrays[1], "word", "wid", true, arrays[2]["wid"],words, id, "ObjetSelectWord");
+            InsertSelect(td, arrays[1], "Mot", "ID du mot", true, arrays[2]["Mot associé"],words, id, "ObjetSelectWord");
             tr.appendChild(td);
-            InsertDeleteImg(tr, id, table);
-            InsertEditImg(tr, id, table, promptvalue);
+            InsertDeleteBtn(tr, id, table);
+            InsertEditBtn(tr, id, table, promptvalue);
             tbl.appendChild(tr);
         });
     });
@@ -822,12 +844,18 @@ function GetValueArray(url, id=null){
     });
 }
 
-function InsertEditImg(tr,id, table, promptvalue,tab = null, data=null){
-    var img = document.createElement("IMG");
+function InsertEditBtn(tr,id, table, promptvalue,tab = null, data=null){
+    var btnEdit = document.createElement("button");
     var td = document.createElement("TD");
-    img.src="../img/icone-edit.png";
-    img.onclick = InsertEditHelper(id, table, promptvalue,tab,data)
-    td.appendChild(img);
+    td.classList = "editTd"
+    btnEdit.classList = "editBtn";
+    btnEdit.innerHTML ="<svg height=\"1em\" viewBox=\"0 0 512 512\">\n" +
+        "    <path\n" +
+        "      d=\"M410.3 231l11.3-11.3-33.9-33.9-62.1-62.1L291.7 89.8l-11.3 11.3-22.6 22.6L58.6 322.9c-10.4 10.4-18 23.3-22.2 37.4L1 480.7c-2.5 8.4-.2 17.5 6.1 23.7s15.3 8.5 23.7 6.1l120.3-35.4c14.1-4.2 27-11.8 37.4-22.2L387.7 253.7 410.3 231zM160 399.4l-9.1 22.7c-4 3.1-8.5 5.4-13.3 6.9L59.4 452l23-78.1c1.4-4.9 3.8-9.4 6.9-13.3l22.7-9.1v32c0 8.8 7.2 16 16 16h32zM362.7 18.7L348.3 33.2 325.7 55.8 314.3 67.1l33.9 33.9 62.1 62.1 33.9 33.9 11.3-11.3 22.6-22.6 14.5-14.5c25-25 25-65.5 0-90.5L453.3 18.7c-25-25-65.5-25-90.5 0zm-47.4 168l-144 144c-6.2 6.2-16.4 6.2-22.6 0s-6.2-16.4 0-22.6l144-144c6.2-6.2 16.4-6.2 22.6 0s6.2 16.4 0 22.6z\"\n" +
+        "    ></path>\n" +
+        "  </svg>"
+    btnEdit.onclick = InsertEditHelper(id, table, promptvalue,tab,data)
+    td.appendChild(btnEdit);
     tr.appendChild(td);
 }
 
@@ -835,6 +863,7 @@ function InsertEditHelper(id, table, promptvalue, tab, data) {
     return function() {
         if(data !== null){
             ShowActionForm(tab,data)
+            window.scrollTo(0, 0);
         }else{
             var newValue = prompt(promptvalue);
             if (newValue !== null) {
@@ -854,12 +883,49 @@ function InsertEditHelper(id, table, promptvalue, tab, data) {
     };
 }
 
-function InsertDeleteImg(tr, id1, table, id2=null, id3=null){
-    var img = document.createElement("IMG");
+function InsertDeleteBtn(tr, id1, table, id2=null, id3=null){
     var td = document.createElement("TD");
-    img.src="../img/icone-delete.png";
-    img.onclick =  InsertDeleteHelper(id1, id2,id3, table)
-    td.appendChild(img);
+    td.classList = "deleteTd"
+    var btnDelete = document.createElement("button");
+    btnDelete.classList = "bin-button";
+    btnDelete.innerHTML = "<svg\n" +
+        "    class=\"bin-top\"\n" +
+        "    viewBox=\"0 0 39 7\"\n" +
+        "    fill=\"none\"\n" +
+        "    xmlns=\"http://www.w3.org/2000/svg\"\n" +
+        "  >\n" +
+        "    <line y1=\"5\" x2=\"39\" y2=\"5\" stroke=\"white\" stroke-width=\"4\"></line>\n" +
+        "    <line\n" +
+        "      x1=\"12\"\n" +
+        "      y1=\"1.5\"\n" +
+        "      x2=\"26.0357\"\n" +
+        "      y2=\"1.5\"\n" +
+        "      stroke=\"white\"\n" +
+        "      stroke-width=\"3\"\n" +
+        "    ></line>\n" +
+        "  </svg>\n" +
+        "  <svg\n" +
+        "    class=\"bin-bottom\"\n" +
+        "    viewBox=\"0 0 33 39\"\n" +
+        "    fill=\"none\"\n" +
+        "    xmlns=\"http://www.w3.org/2000/svg\"\n" +
+        "  >\n" +
+        "    <mask id=\"path-1-inside-1_8_19\" fill=\"white\">\n" +
+        "      <path\n" +
+        "        d=\"M0 0H33V35C33 37.2091 31.2091 39 29 39H4C1.79086 39 0 37.2091 0 35V0Z\"\n" +
+        "      ></path>\n" +
+        "    </mask>\n" +
+        "    <path\n" +
+        "      d=\"M0 0H33H0ZM37 35C37 39.4183 33.4183 43 29 43H4C-0.418278 43 -4 39.4183 -4 35H4H29H37ZM4 43C-0.418278 43 -4 39.4183 -4 35V0H4V35V43ZM37 0V35C37 39.4183 33.4183 43 29 43V35V0H37Z\"\n" +
+        "      fill=\"white\"\n" +
+        "      mask=\"url(#path-1-inside-1_8_19)\"\n" +
+        "    ></path>\n" +
+        "    <path d=\"M12 6L12 29\" stroke=\"white\" stroke-width=\"4\"></path>\n" +
+        "    <path d=\"M21 6V29\" stroke=\"white\" stroke-width=\"4\"></path>\n" +
+        "  </svg>"
+
+    btnDelete.onclick =  InsertDeleteHelper(id1, id2,id3, table)
+    td.appendChild(btnDelete);
     tr.appendChild(td);
 }
 
@@ -905,7 +971,7 @@ function Refresh (str){
     }
 }
 
-function InsertColumn(tr, item, isTab=false){
+function InsertColumn(tr, item, isTab=false, isTh=false){
     var td = document.createElement("TD");
     if (isTab){
         var str = "";
@@ -927,12 +993,20 @@ function InsertColumn(tr, item, isTab=false){
         var tn1 = document.createTextNode(str);
         td.appendChild(tn1);
         td.style.whiteSpace = "pre"
-    }else {
+    } else {
         item = String(item).trunc(80, " ", true);
         var tn2 = document.createTextNode(item);
         td.appendChild(tn2);
     }
-    tr.appendChild(td);
+
+    if (isTh){
+        var th = document.createElement("TH");
+        th.appendChild(td.firstChild);
+        tr.appendChild(th);
+    } else{
+        tr.appendChild(td);
+    }
+
 }
 
 function InsertSelectHelper(table, id){

@@ -17,7 +17,7 @@ while ($row=$stm->fetch()){
 $stm=$dbh->prepare("SELECT objid, objdesc FROM obj ORDER BY objid");
 $stm->execute();
 while ($row=$stm->fetch()){
-    $value=array("objid"=>$row["objid"], "objdesc"=>$row["objdesc"]);
+    $value=array("ID de l'objet"=>$row["objid"], "Description"=>$row["objdesc"]);
     $a["obj"][]=$value;
 }
 
@@ -33,7 +33,7 @@ while ($row=$stm->fetch()){
 $stm=$dbh->prepare("SELECT mid, message FROM msg ORDER BY mid");
 $stm->execute();
 while ($row=$stm->fetch()){
-    $value=array("mid"=>$row["mid"], "message"=>$row["message"]);
+    $value=array("ID du message"=>$row["mid"], "Message"=>$row["message"]);
     $a["msg"][]=$value;
 }
 
@@ -41,7 +41,7 @@ while ($row=$stm->fetch()){
 $stm=$dbh->prepare("SELECT wid,word FROM vocab ORDER BY wid");
 $stm->execute();
 while ($row=$stm->fetch()){
-    $value=array("wid"=>$row["wid"], "word"=>$row["word"]);
+    $value=array("ID du mot"=>$row["wid"], "Mot"=>$row["word"]);
     $a["vocab"][]=$value;
 }
 

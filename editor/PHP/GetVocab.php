@@ -9,7 +9,7 @@ $stm=$dbh->prepare("SELECT wid,word FROM vocab ORDER BY wid");
 $stm->execute();
 
 while ($row=$stm->fetch()){
-    $value=array("wid"=>$row["wid"], "word"=>$row["word"]);
+    $value=array("ID du mot"=>$row["wid"], "Mot"=>$row["word"]);
     $a[]=$value;
 }
 
