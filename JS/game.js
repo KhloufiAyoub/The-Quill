@@ -108,11 +108,14 @@ function action(str) {
     var result = JSON.parse(str);
     var area = $("area");
     timeOutId = null;
+    var submitInput = $("submitInput");
+    var logoutSubmit = $("logout");
+    var gameInput = $("gameInput");
     switch(result["action"]){
         case "CMD":
-            $("submitInput").disabled = false;
-            $("logout").disabled = false;
-            $("gameInput").focus();
+            submitInput.disabled = false;
+            logoutSubmit.disabled = false;
+            gameInput.focus();
             break;
         case "CLEAR":
             area.value  = "";
@@ -151,9 +154,9 @@ function action(str) {
         case "YESNO":
             area.value += result["str"].replace(/<br>/g, "\n") + "\n\n";
             area.scrollTop = area.scrollHeight;
-            $("submitInput").disabled = false;
-            $("logout").disabled = false;
-            $("gameInput").focus();
+            submitInput.disabled = false;
+            logoutSubmit.disabled = false;
+            gameInput.focus();
             break;
         case "SAVESLOT":
             area.value += result["str"].replace(/<br>/g, "\n") + "\n\n";
