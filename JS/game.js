@@ -16,6 +16,7 @@ function init(){
 function login(){
     var username = $("username").value;
     var psw = $("psw").value;
+
     var url="PHP/Login.php";
     var param="username="+encodeURIComponent(username)+"&psw="+encodeURIComponent(psw);
     var xhr= new XMLHttpRequest();

@@ -23,7 +23,6 @@ switch ($_SESSION["etat_partie"]["jeu"]["etat_machine"]) {
         //si on ne traite pas d'instruction
         if($_SESSION["etat_partie"]["jeu"]["num_instruction"]==0) {
             //on essaye de lire la regle courante
-
             if ($row = $stm->fetch()) {
                 //vérifie les conditions et les mots
                 if (CheckCondition($row["wid1"], $row["wid2"], $row["pgm"])) {
